@@ -328,7 +328,9 @@ SOFTWARE.
               style:
                 "display: inline-flex; vertical-align: middle; width: auto; margin-left: 8px;",
             }).appendTo(outputRow);
-            let outTypeRow = $("<div/>").appendTo(outputBox);
+            let outTypeRow = $("<div/>", {
+              style: "margin-left: 5px; ",
+            }).appendTo(outputBox);
             let outValueRow = $("<div/>", {
               style: "margin-left: 5px; ",
             }).appendTo(outputBox);
