@@ -112,8 +112,9 @@ module.exports = function (RED) {
 
         // check for presence of variable name
         if (
-          (event.trigger.type == "global" || event.trigger.type == "flow") &&
-          !event.trigger.value
+          (event.trigger.timeType == "global" ||
+            event.trigger.timeType == "flow") &&
+          !event.trigger.timeValue
         ) {
           valid = false;
           break;
@@ -121,8 +122,8 @@ module.exports = function (RED) {
 
         // check for valid user time
         if (
-          event.trigger.type == "time" &&
-          !chronos.isValidUserTime(event.trigger.value)
+          event.trigger.timeType == "time" &&
+          !chronos.isValidUserTime(event.trigger.timeValue)
         ) {
           valid = false;
           break;
@@ -290,15 +291,15 @@ module.exports = function (RED) {
       stopTimer(data);
 
       if (
-        data.config.trigger.type == "global" ||
-        data.config.trigger.type == "flow"
+        data.config.trigger.timeType == "global" ||
+        data.config.trigger.timeType == "flow"
       ) {
-        let ctx = RED.util.parseContextStore(data.config.trigger.value);
+        let ctx = RED.util.parseContextStore(data.config.trigger.timeValue);
         node.debug(
           "[Timer:" +
             data.id +
             "] Load trigger from context variable " +
-            data.config.trigger.type +
+            data.config.trigger.timeType +
             "." +
             ctx.key +
             (ctx.store ? " (" + ctx.store + ")" : "")
@@ -306,7 +307,7 @@ module.exports = function (RED) {
 
         let ctxData = node
           .context()
-          [data.config.trigger.type].get(ctx.key, ctx.store);
+          [data.config.trigger.timeType].get(ctx.key, ctx.store);
 
         if (validateExtendedContextData(ctxData)) {
           node.debug(
@@ -331,7 +332,7 @@ module.exports = function (RED) {
           node.error(
             RED._("scheduler.error.invalidEvent", {
               event:
-                data.config.trigger.type +
+                data.config.trigger.timeType +
                 "." +
                 ctx.key +
                 (ctx.store ? " (" + ctx.store + ")" : ""),
@@ -383,16 +384,9 @@ module.exports = function (RED) {
           RED,
           node,
           repeat ? now.clone().add(1, "days") : now.clone(),
-          data.config.trigger.type,
-          data.config.trigger.value
+          data.config.trigger.timeType,
+          data.config.trigger.timeValue
         );
-
-        if (data.config.trigger.offset != 0) {
-          let offset = data.config.trigger.random
-            ? Math.round(Math.random() * data.config.trigger.offset)
-            : data.config.trigger.offset;
-          triggerTime.add(offset, "minutes");
-        }
 
         if (triggerTime.isBefore(now)) {
           node.debug(
@@ -401,15 +395,15 @@ module.exports = function (RED) {
               "] Trigger time before current time, adding one day"
           );
 
-          if (data.config.trigger.type == "time") {
+          if (data.config.trigger.timeType == "time") {
             triggerTime.add(1, "days");
           } else {
             triggerTime = chronos.getTime(
               RED,
               node,
               triggerTime.add(1, "days"),
-              data.config.trigger.type,
-              data.config.trigger.value
+              data.config.trigger.timeType,
+              data.config.trigger.timeValue
             );
           }
         }
@@ -510,18 +504,6 @@ module.exports = function (RED) {
           )) ||
         (data.type == "moon" && !/^(rise|set)$/.test(data.value))
       ) {
-        return false;
-      }
-
-      if (
-        typeof data.offset != "number" ||
-        data.offset < -300 ||
-        data.offset > 300
-      ) {
-        return false;
-      }
-
-      if (typeof data.random != "boolean") {
         return false;
       }
 

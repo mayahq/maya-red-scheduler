@@ -9,7 +9,9 @@
             "schedule":    "Schedule",
             "output":      "Output",
             "multiPort":   "Dedicated output ports for schedule events",
-            "disabled":    "Start with disabled schedule"
+            "disabled":    "Start with disabled schedule",
+            "now":     "Today",
+            "date":    "Enter Date"
         },
         "status":
         {

@@ -84,7 +84,12 @@ SOFTWARE.
       schedule: {
         value: [
           {
-            trigger: { type: "time", value: "", offset: 0, random: false },
+            trigger: {
+              timeType: "time",
+              timeValue: "",
+              dateType: "time",
+              dateValue: "",
+            },
             output: {
               type: "msg",
               property: { name: "payload", type: "str", value: "" },
@@ -228,6 +233,21 @@ SOFTWARE.
               validate: /^(\d|0\d|1\d|2[0-3]):([0-5]\d)(:([0-5]\d))?\s*(am|AM|pm|PM)?$/,
             };
 
+            const dateInput = {
+              value: "date",
+              label: node._("scheduler.label.date"),
+              icon: "fa fa-calendar",
+              hasValue: true,
+              validate: /^([2-9]\d\d\d)-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12]\d|3[01])$/,
+            };
+
+            const nowInput = {
+              value: "now",
+              label: node._("scheduler.label.now"),
+              icon: "fa fa-clock-o",
+              hasValue: false,
+            };
+
             const sunTimeInput = {
               value: "sun",
               label: node._(
@@ -264,22 +284,6 @@ SOFTWARE.
               hasValue: false,
             };
 
-            const offsetInput = {
-              min: -300,
-              max: 300,
-              step: 5,
-              change: function (event, ui) {
-                var value = parseInt($(this).spinner("value"), 10);
-                var min = $(this).spinner("option", "min");
-                var max = $(this).spinner("option", "max");
-                if (isNaN(value) || value < min) {
-                  $(this).spinner("value", min);
-                } else if (value > max) {
-                  $(this).spinner("value", max);
-                }
-              },
-            };
-
             let fragment = document.createDocumentFragment();
             let triggerRow = $("<div/>").appendTo(fragment);
             let outputRow = $("<div/>", {
@@ -301,56 +305,32 @@ SOFTWARE.
                   "flow",
                 ],
               });
-            triggerType.typedInput("width", "280px");
+            triggerType.typedInput("width", "220px");
             triggerType._prevType = "time";
 
-            let offsetBox = $("<div/>", {
-              style: "display: inline-block;",
-            }).appendTo(triggerRow);
-            let offsetLabel = $("<label/>", {
-              title: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.offset"
-              ),
-              style: "display: inline-block; width: auto; margin-bottom: 0px;",
+            let triggerDate = $("<input/>", {
+              type: "text",
+              class: "node-input-triggerDate",
+              style: "margin-left : 5px;",
             })
-              .html(
-                "<span style='margin-left: 6px; margin-right: 6px;'>&#8597;</span>"
-              )
-              .appendTo(offsetBox);
-            let triggerOffset = $("<input/>", {
-              class: "node-input-triggerOffset",
-              style: "width: 50px;",
-            })
-              .appendTo(offsetLabel)
-              .spinner(offsetInput);
-            let randomLabel = $("<label/>", {
-              title: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.random"
-              ),
-              style: "width: auto; margin-left: 10px; margin-bottom: 0px;",
-            })
-              .html("<i class='fa fa-random' aria-hidden='true'></i>")
-              .appendTo(offsetBox);
-            let triggerRandom = $("<input/>", {
-              type: "checkbox",
-              class: "node-input-triggerRandom",
-              style:
-                "width: auto; margin-left: 4px; margin-top: 0px; margin-bottom: 3px;",
-            }).appendTo(randomLabel);
+              .appendTo(triggerRow)
+              .typedInput({ types: [nowInput, dateInput] });
+            triggerDate.typedInput("width", "220px");
+            triggerDate._prevType = "date";
 
             $("<div/>", {
-              style: "display: inline-block; width: auto; margin-left: 20px;",
+              style: "display: inline-block; width: auto; ",
             })
               .text(node._("scheduler.label.output"))
               .appendTo(outputRow);
 
             let outputBox = $("<div/>", {
               style:
-                "display: inline-block; vertical-align: middle; width: auto; margin-left: 8px;",
+                "display: inline-flex; vertical-align: middle; width: auto; margin-left: 8px;",
             }).appendTo(outputRow);
             let outTypeRow = $("<div/>").appendTo(outputBox);
             let outValueRow = $("<div/>", {
-              style: "margin-top: 5px; ",
+              style: "margin-left: 5px; ",
             }).appendTo(outputBox);
 
             let outType = $("<input/>", {
@@ -361,7 +341,7 @@ SOFTWARE.
               .typedInput({
                 types: ["global", "flow", "msg", fullMessageInput],
               });
-            outType.typedInput("width", "280px");
+            outType.typedInput("width", "190px");
             outType._prevType = "global";
             let propValue = $("<input/>", {
               type: "text",
@@ -371,7 +351,7 @@ SOFTWARE.
               .typedInput({
                 types: ["str", "num", "bool", "json", "bin", "date"],
               });
-            propValue.typedInput("width", "280px");
+            propValue.typedInput("width", "190px");
             let msgValue = $("<input/>", {
               type: "text",
               class: "node-input-msgValue",
@@ -382,17 +362,17 @@ SOFTWARE.
 
             triggerType.on("change", function () {
               let type = triggerType.typedInput("type");
-              if (type === "global" || type === "flow") {
-                offsetBox.hide();
-              } else {
-                offsetBox.show();
-              }
 
               if (type != triggerType._prevType) {
                 triggerType._prevType = type;
-                if (type != "sun" && type != "moon") {
-                  triggerType.typedInput("value", "");
-                }
+              }
+            });
+
+            triggerDate.on("change", function () {
+              let type = triggerDate.typedInput("type");
+
+              if (type != triggerDate._prevType) {
+                triggerDate._prevType = type;
               }
             });
 
@@ -414,7 +394,12 @@ SOFTWARE.
 
             if (!("trigger" in data)) {
               data = {
-                trigger: { type: "time", value: "", offset: 0, random: false },
+                trigger: {
+                  timeType: "time",
+                  timeValue: "",
+                  dateType: "date",
+                  dateValue: "",
+                },
                 output: {
                   type: "msg",
                   property: { name: "payload", type: "str", value: "" },
@@ -428,14 +413,13 @@ SOFTWARE.
               };
             }
 
-            triggerType.typedInput("value", data.trigger.value);
-            triggerType._prevType = data.trigger.type;
-            triggerType.typedInput("type", data.trigger.type);
+            triggerType.typedInput("value", data.trigger.timeValue);
+            triggerType._prevType = data.trigger.timeType;
+            triggerType.typedInput("type", data.trigger.timeType);
 
-            if (data.trigger.type != "global" && data.trigger.type != "flow") {
-              triggerOffset.spinner("value", data.trigger.offset);
-              triggerRandom.prop("checked", data.trigger.random);
-            }
+            triggerDate.typedInput("value", data.trigger.dateValue);
+            triggerDate._prevType = data.trigger.dateType;
+            triggerDate.typedInput("type", data.trigger.dateType);
 
             if (data.output.type == "fullMsg") {
               msgValue.typedInput("value", data.output.value);
@@ -467,19 +451,17 @@ SOFTWARE.
         let data = { trigger: {}, output: {} };
 
         let triggerType = $(this).find(".node-input-triggerType");
-        let triggerOffset = $(this).find(".node-input-triggerOffset");
-        let triggerRandom = $(this).find(".node-input-triggerRandom");
+        let triggerDate = $(this).find(".node-input-triggerDate");
+
         let outType = $(this).find(".node-input-outType");
         let propValue = $(this).find(".node-input-propValue");
         let msgValue = $(this).find(".node-input-msgValue");
 
-        data.trigger.type = triggerType.typedInput("type");
-        data.trigger.value = triggerType.typedInput("value");
+        data.trigger.timeType = triggerType.typedInput("type");
+        data.trigger.timeValue = triggerType.typedInput("value");
 
-        if (data.trigger.type != "global" && data.trigger.type != "flow") {
-          data.trigger.offset = triggerOffset.spinner("value");
-          data.trigger.random = triggerRandom.prop("checked");
-        }
+        data.trigger.dateType = triggerDate.typedInput("type");
+        data.trigger.dateValue = triggerDate.typedInput("value");
 
         data.output.type = outType.typedInput("type");
         if (data.output.type == "fullMsg") {
@@ -496,41 +478,29 @@ SOFTWARE.
           if (multiPort) {
             data.port = node.outputs++;
 
-            if (data.trigger.type == "global" || data.trigger.type == "flow") {
-              let ctx = RED.utils.parseContextKey(data.trigger.value);
+            if (
+              data.trigger.timeType == "global" ||
+              data.trigger.timeType == "flow"
+            ) {
+              let ctx = RED.utils.parseContextKey(data.trigger.timeValue);
               data.label =
-                data.trigger.type +
+                data.trigger.timeType +
                 "." +
                 ctx.key +
                 (ctx.store ? " (" + ctx.store + ")" : "");
             } else {
               if (
-                data.trigger.type == "time" ||
-                data.trigger.type == "custom"
+                data.trigger.timeType == "time" ||
+                data.trigger.timeType == "custom"
               ) {
-                data.label = data.trigger.value;
+                data.label = data.trigger.timeValue;
               } else {
                 data.label = node._(
                   "node-red-contrib-chronos/chronos-config:common.list." +
-                    data.trigger.type +
+                    data.trigger.timeType +
                     "." +
-                    data.trigger.value
+                    data.trigger.timeValue
                 );
-              }
-
-              if (data.trigger.offset != 0) {
-                data.label += data.trigger.offset > 0 ? " + " : " - ";
-
-                if (data.trigger.random) {
-                  data.label += "~";
-                }
-
-                data.label +=
-                  Math.abs(data.trigger.offset) +
-                  " " +
-                  node._(
-                    "node-red-contrib-chronos/chronos-config:common.label.min"
-                  );
               }
             }
           } else {
