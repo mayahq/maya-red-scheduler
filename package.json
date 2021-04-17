@@ -32,6 +32,7 @@
         "nodes": {
             "chronos-config": "nodes/config.js",
             "chronos-scheduler": "nodes/scheduler.js",
+            "chronos-scheduler-api": "nodes/scheduler-api.js",
             "chronos-delay": "nodes/delay.js",
             "chronos-switch": "nodes/switch.js",
             "chronos-filter": "nodes/filter.js",

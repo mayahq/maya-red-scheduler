@@ -23,7 +23,7 @@
  */
 
 module.exports = function (RED) {
-  function ChronosSchedulerNode(settings) {
+  function ChronosSchedulerNodeAPI(settings) {
     const chronos = require("./common/chronos.js");
 
     let node = this;
@@ -595,5 +595,5 @@ module.exports = function (RED) {
     }
   }
 
-  RED.nodes.registerType("chronos-scheduler", ChronosSchedulerNode);
+  RED.nodes.registerType("chronos-scheduler-api", ChronosSchedulerNodeAPI);
 };
