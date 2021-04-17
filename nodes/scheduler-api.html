@@ -289,6 +289,10 @@ SOFTWARE.
             let outputRow = $("<div/>", {
               style: "margin-top: 5px; ",
             }).appendTo(fragment);
+            let repeatRow = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-top : 5px;",
+            }).appendTo(fragment);
 
             let triggerType = $("<input/>", {
               type: "text",
@@ -362,6 +366,420 @@ SOFTWARE.
               .typedInput({ types: ["json"] });
             msgValue.typedInput("width", "280px");
 
+            let repeater = $("<select/>", {
+              class: "node-input-repeater",
+              style: "width: 120px; ",
+            }).appendTo(repeatRow);
+            let repeatGrp = $("<optgroup></optgroup>")
+              .attr(
+                "label",
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.repeater.label"
+                )
+              )
+              .append(
+                $("<option></option>")
+                  .val("none")
+                  .text(
+                    node._(
+                      "node-red-contrib-chronos/chronos-config:common.list.repeater.list.none"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("hourly")
+                  .text(
+                    node._(
+                      "node-red-contrib-chronos/chronos-config:common.list.repeater.list.hourly"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("daily")
+                  .text(
+                    node._(
+                      "node-red-contrib-chronos/chronos-config:common.list.repeater.list.daily"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("weekly")
+                  .text(
+                    node._(
+                      "node-red-contrib-chronos/chronos-config:common.list.repeater.list.weekly"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("monthly")
+                  .text(
+                    node._(
+                      "node-red-contrib-chronos/chronos-config:common.list.repeater.list.monthly"
+                    )
+                  )
+              )
+              .appendTo(repeater);
+            let daysBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;",
+            }).appendTo(repeatRow);
+
+            let monday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-monday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.weekday.monday"
+                )
+              )
+              .appendTo(daysBox);
+            let tuesday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-tuesday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.weekday.tuesday"
+                )
+              )
+              .appendTo(daysBox);
+            let wednesday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-wednesday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.weekday.wednesday"
+                )
+              )
+              .appendTo(daysBox);
+            let thursday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-thursday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.weekday.thursday"
+                )
+              )
+              .appendTo(daysBox);
+            let friday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-friday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.weekday.friday"
+                )
+              )
+              .appendTo(daysBox);
+            let saturday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-saturday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.weekday.saturday"
+                )
+              )
+              .appendTo(daysBox);
+            let sunday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-sunday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.weekday.sunday"
+                )
+              )
+              .appendTo(daysBox);
+
+            let monthsBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;",
+            }).appendTo(repeatRow);
+
+            let monthsRow1 = $("<div/>").appendTo(monthsBox);
+            let monthsRow2 = $("<div/>", {
+              style: "margin-top: 5px;",
+            }).appendTo(monthsBox);
+            let monthsRow3 = $("<div/>", {
+              style: "margin-top: 5px;",
+            }).appendTo(monthsBox);
+
+            let january = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-january",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.january"
+                )
+              )
+              .appendTo(monthsRow1);
+            let february = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-february",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.february"
+                )
+              )
+              .appendTo(monthsRow1);
+            let march = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-march",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.march"
+                )
+              )
+              .appendTo(monthsRow1);
+            let april = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-april",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.april"
+                )
+              )
+              .appendTo(monthsRow1);
+            let may = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-may",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.may"
+                )
+              )
+              .appendTo(monthsRow2);
+            let june = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-june",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.june"
+                )
+              )
+              .appendTo(monthsRow2);
+            let july = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-july",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.july"
+                )
+              )
+              .appendTo(monthsRow2);
+            let august = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-august",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.august"
+                )
+              )
+              .appendTo(monthsRow2);
+            let september = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-september",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.september"
+                )
+              )
+              .appendTo(monthsRow3);
+            let october = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-october",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.october"
+                )
+              )
+              .appendTo(monthsRow3);
+            let november = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-november",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.november"
+                )
+              )
+              .appendTo(monthsRow3);
+            let december = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-december",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "node-red-contrib-chronos/chronos-config:common.list.month.december"
+                )
+              )
+              .appendTo(monthsRow3);
+
+            let weeksBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;",
+            }).appendTo(repeatRow);
+
+            let week1 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-december",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weeksBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text("wk 1")
+              .appendTo(weeksBox);
+
+            let week2 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-december",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weeksBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text("wk 2")
+              .appendTo(weeksBox);
+            let week3 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-december",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weeksBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text("wk 3")
+              .appendTo(weeksBox);
+
+            let week4 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-december",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weeksBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text("wk 4")
+              .appendTo(weeksBox);
+
             triggerType.on("change", function () {
               let type = triggerType.typedInput("type");
 
@@ -393,6 +811,30 @@ SOFTWARE.
                 outType.typedInput("value", "");
               }
             });
+
+            repeater.change(function () {
+              daysBox.hide();
+              monthsBox.hide();
+              weeksBox.hide();
+
+              var value = $(this).val();
+              switch (value) {
+                case "daily": {
+                  daysBox.show();
+                  break;
+                }
+                case "weekly": {
+                  weeksBox.show();
+                  break;
+                }
+                case "monthly": {
+                  monthsBox.show();
+                  break;
+                }
+              }
+            });
+
+            repeater.change();
 
             if (!("trigger" in data)) {
               data = {
