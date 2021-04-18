@@ -87,12 +87,17 @@ SOFTWARE.
             trigger: {
               timeType: "time",
               timeValue: "",
-              dateType: "time",
+              dateType: "now",
               dateValue: "",
             },
             output: {
               type: "msg",
               property: { name: "payload", type: "str", value: "" },
+            },
+            repeat: {
+              repeater: "before",
+              operands: { type: "time", value: "", offset: 0, random: false },
+              label: "",
             },
           },
         ],
@@ -294,9 +299,9 @@ SOFTWARE.
                 "display: inline-block; vertical-align: middle; width: auto; margin-top : 5px;",
             }).appendTo(fragment);
 
-            let triggerType = $("<input/>", {
+            let triggerTime = $("<input/>", {
               type: "text",
-              class: "node-input-triggerType",
+              class: "node-input-triggerTime",
             })
               .appendTo(triggerRow)
               .typedInput({
@@ -309,8 +314,8 @@ SOFTWARE.
                   "flow",
                 ],
               });
-            triggerType.typedInput("width", "220px");
-            triggerType._prevType = "time";
+            triggerTime.typedInput("width", "220px");
+            triggerTime._prevType = "time";
 
             let triggerDate = $("<input/>", {
               type: "text",
@@ -780,11 +785,11 @@ SOFTWARE.
               .text("wk 4")
               .appendTo(weeksBox);
 
-            triggerType.on("change", function () {
-              let type = triggerType.typedInput("type");
+            triggerTime.on("change", function () {
+              let type = triggerTime.typedInput("type");
 
-              if (type != triggerType._prevType) {
-                triggerType._prevType = type;
+              if (type != triggerTime._prevType) {
+                triggerTime._prevType = type;
               }
             });
 
@@ -834,19 +839,27 @@ SOFTWARE.
               }
             });
 
-            repeater.change();
-
             if (!("trigger" in data)) {
               data = {
                 trigger: {
                   timeType: "time",
                   timeValue: "",
-                  dateType: "date",
+                  dateType: "now",
                   dateValue: "",
                 },
                 output: {
                   type: "msg",
                   property: { name: "payload", type: "str", value: "" },
+                },
+                repeat: {
+                  repeater: "none",
+                  operands: {
+                    type: "time",
+                    value: "",
+                    offset: 0,
+                    random: false,
+                  },
+                  label: "",
                 },
               };
             } else if (!("type" in data.output)) {
@@ -855,15 +868,53 @@ SOFTWARE.
                 type: "msg",
                 property: { name: "payload", type: "str", value: "" },
               };
+            } else if (!("repeat" in data)) {
+              data.repeat = {
+                repeater: "none",
+                operands: {
+                  type: "time",
+                  value: "",
+                  offset: 0,
+                  random: false,
+                },
+                label: "",
+              };
             }
 
-            triggerType.typedInput("value", data.trigger.timeValue);
-            triggerType._prevType = data.trigger.timeType;
-            triggerType.typedInput("type", data.trigger.timeType);
+            if (data.repeat.repeater == "weekdays") {
+              sunday.prop("checked", data.repeat.operands[0]);
+              monday.prop("checked", data.repeat.operands[1]);
+              tuesday.prop("checked", data.repeat.operands[2]);
+              wednesday.prop("checked", data.repeat.operands[3]);
+              thursday.prop("checked", data.repeat.operands[4]);
+              friday.prop("checked", data.repeat.operands[5]);
+              saturday.prop("checked", data.repeat.operands[6]);
+            } else if (data.repeat.repeater == "months") {
+              january.prop("checked", data.repeat.operands[0]);
+              february.prop("checked", data.repeat.operands[1]);
+              march.prop("checked", data.repeat.operands[2]);
+              april.prop("checked", data.repeat.operands[3]);
+              may.prop("checked", data.repeat.operands[4]);
+              june.prop("checked", data.repeat.operands[5]);
+              july.prop("checked", data.repeat.operands[6]);
+              august.prop("checked", data.repeat.operands[7]);
+              september.prop("checked", data.repeat.operands[8]);
+              october.prop("checked", data.repeat.operands[9]);
+              november.prop("checked", data.repeat.operands[10]);
+              december.prop("checked", data.repeat.operands[11]);
+            }
+
+            repeater.change();
+
+            triggerTime.typedInput("value", data.trigger.timeValue);
+            triggerTime._prevType = data.trigger.timeType;
+            triggerTime.typedInput("type", data.trigger.timeType);
 
             triggerDate.typedInput("value", data.trigger.dateValue);
             triggerDate._prevType = data.trigger.dateType;
             triggerDate.typedInput("type", data.trigger.dateType);
+
+            console.log("on prepare:", data);
 
             if (data.output.type == "fullMsg") {
               msgValue.typedInput("value", data.output.value);
@@ -894,15 +945,15 @@ SOFTWARE.
       scheduleList.each(function (index) {
         let data = { trigger: {}, output: {} };
 
-        let triggerType = $(this).find(".node-input-triggerType");
+        let triggerTime = $(this).find(".node-input-triggerTime");
         let triggerDate = $(this).find(".node-input-triggerDate");
 
         let outType = $(this).find(".node-input-outType");
         let propValue = $(this).find(".node-input-propValue");
         let msgValue = $(this).find(".node-input-msgValue");
 
-        data.trigger.timeType = triggerType.typedInput("type");
-        data.trigger.timeValue = triggerType.typedInput("value");
+        data.trigger.timeType = triggerTime.typedInput("type");
+        data.trigger.timeValue = triggerTime.typedInput("value");
 
         data.trigger.dateType = triggerDate.typedInput("type");
         data.trigger.dateValue = triggerDate.typedInput("value");
@@ -951,6 +1002,8 @@ SOFTWARE.
             node.outputs = 1;
           }
         }
+
+        console.log("on save:", data);
 
         node.schedule.push(data);
       });

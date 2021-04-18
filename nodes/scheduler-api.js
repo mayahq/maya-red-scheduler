@@ -111,6 +111,7 @@ module.exports = function (RED) {
         let event = node.schedule[i].config;
 
         // check for presence of variable name
+        // console.log(event.trigger.dateType, event.trigger.dateValue);
         if (
           (event.trigger.timeType == "global" ||
             event.trigger.timeType == "flow") &&
@@ -386,6 +387,14 @@ module.exports = function (RED) {
           repeat ? now.clone().add(1, "days") : now.clone(),
           data.config.trigger.timeType,
           data.config.trigger.timeValue
+        );
+
+        let triggerDate = chronos.getUserDate(
+          RED,
+          node,
+          repeat ? now.clone().add(1, "days") : now.clone(),
+          data.config.trigger.dateType,
+          data.config.trigger.dateValue
         );
 
         if (triggerTime.isBefore(now)) {
