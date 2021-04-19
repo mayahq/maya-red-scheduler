@@ -1,8 +1,5 @@
 # maya-red-scheduler
 
-<a href="https://www.npmjs.com/package/node-red-contrib-chronos"><img title="npm version" src="https://badgen.net/npm/v/node-red-contrib-chronos"></a>
-<a href="https://www.npmjs.com/package/node-red-contrib-chronos"><img title="npm downloads" src="https://badgen.net/npm/dt/node-red-contrib-chronos"></a>
-
 This is a custom fork of Jens Rossbach's excellent [chronos](https://github.com/jensrossbach/node-red-contrib-chronos) package, with mods to make it dynamically schedule events in Maya's context + repeated scheduling.
 
 A collection of Node-RED nodes for date and time based scheduling, queueing, routing, filtering and manipulating. Automatically calculated times from sun events (sunrise, sunset, dusk, dawn, ...) or moon events (moonrise, moonset) are supported as well.
