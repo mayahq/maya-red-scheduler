@@ -95,9 +95,8 @@ SOFTWARE.
               property: { name: "payload", type: "str", value: "" },
             },
             repeat: {
-              repeater: "before",
-              operands: { type: "time", value: "", offset: 0, random: false },
-              label: "",
+              repeater: "none",
+              operands: [],
             },
           },
         ],
@@ -740,7 +739,7 @@ SOFTWARE.
 
             let week1 = $("<input/>", {
               type: "checkbox",
-              class: "node-input-december",
+              class: "node-input-week1",
               style:
                 "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
             }).appendTo(weeksBox);
@@ -752,7 +751,7 @@ SOFTWARE.
 
             let week2 = $("<input/>", {
               type: "checkbox",
-              class: "node-input-december",
+              class: "node-input-week2",
               style:
                 "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
             }).appendTo(weeksBox);
@@ -763,7 +762,7 @@ SOFTWARE.
               .appendTo(weeksBox);
             let week3 = $("<input/>", {
               type: "checkbox",
-              class: "node-input-december",
+              class: "node-input-week3",
               style:
                 "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
             }).appendTo(weeksBox);
@@ -775,7 +774,7 @@ SOFTWARE.
 
             let week4 = $("<input/>", {
               type: "checkbox",
-              class: "node-input-december",
+              class: "node-input-week4",
               style:
                 "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
             }).appendTo(weeksBox);
@@ -853,12 +852,7 @@ SOFTWARE.
                 },
                 repeat: {
                   repeater: "none",
-                  operands: {
-                    type: "time",
-                    value: "",
-                    offset: 0,
-                    random: false,
-                  },
+                  operands: [],
                   label: "",
                 },
               };
@@ -871,17 +865,14 @@ SOFTWARE.
             } else if (!("repeat" in data)) {
               data.repeat = {
                 repeater: "none",
-                operands: {
-                  type: "time",
-                  value: "",
-                  offset: 0,
-                  random: false,
-                },
+                operands: [],
                 label: "",
               };
             }
 
-            if (data.repeat.repeater == "weekdays") {
+            repeater.val(data.repeat.repeater);
+
+            if (data.repeat.repeater == "daily") {
               sunday.prop("checked", data.repeat.operands[0]);
               monday.prop("checked", data.repeat.operands[1]);
               tuesday.prop("checked", data.repeat.operands[2]);
@@ -889,7 +880,12 @@ SOFTWARE.
               thursday.prop("checked", data.repeat.operands[4]);
               friday.prop("checked", data.repeat.operands[5]);
               saturday.prop("checked", data.repeat.operands[6]);
-            } else if (data.repeat.repeater == "months") {
+            } else if (data.repeat.repeater == "weekly") {
+              week1.prop("checked", data.repeat.operands[0]);
+              week2.prop("checked", data.repeat.operands[1]);
+              week3.prop("checked", data.repeat.operands[2]);
+              week4.prop("checked", data.repeat.operands[3]);
+            } else if (data.repeat.repeater == "monthly") {
               january.prop("checked", data.repeat.operands[0]);
               february.prop("checked", data.repeat.operands[1]);
               march.prop("checked", data.repeat.operands[2]);
@@ -907,15 +903,9 @@ SOFTWARE.
             triggerTime.typedInput("value", data.trigger.timeValue);
             triggerTime._prevType = data.trigger.timeType;
             triggerTime.typedInput("type", data.trigger.timeType);
-            console.log(
-              "After setting time: ",
-              triggerTime.typedInput("value"),
-              triggerTime.typedInput("type")
-            );
 
             triggerDate._prevType = data.trigger.dateType;
             triggerDate.typedInput("type", data.trigger.dateType);
-
             if (data.trigger.dateType == "date") {
               triggerDate.typedInput("value", data.trigger.dateValue);
             }
@@ -948,7 +938,7 @@ SOFTWARE.
       node.outputs = 0;
 
       scheduleList.each(function (index) {
-        let data = { trigger: {}, output: {} };
+        let data = { trigger: {}, output: {}, repeat: {} };
 
         let triggerTime = $(this).find(".node-input-triggerTime");
         let triggerDate = $(this).find(".node-input-triggerDate");
@@ -962,6 +952,99 @@ SOFTWARE.
 
         data.trigger.dateType = triggerDate.typedInput("type");
         data.trigger.dateValue = triggerDate.typedInput("value");
+
+        let repeater = $(this).find(".node-input-repeater");
+        //Get day ticks
+        let monday = $(this).find(".node-input-monday");
+        let tuesday = $(this).find(".node-input-tuesday");
+        let wednesday = $(this).find(".node-input-wednesday");
+        let thursday = $(this).find(".node-input-thursday");
+        let friday = $(this).find(".node-input-friday");
+        let saturday = $(this).find(".node-input-saturday");
+        let sunday = $(this).find(".node-input-sunday");
+        // Get weekly ticks
+        let week1 = $(this).find(".node-input-week1");
+        let week2 = $(this).find(".node-input-week2");
+        let week3 = $(this).find(".node-input-week3");
+        let week4 = $(this).find(".node-input-week4");
+        // Get monthly ticks
+        let january = $(this).find(".node-input-january");
+        let february = $(this).find(".node-input-february");
+        let march = $(this).find(".node-input-march");
+        let april = $(this).find(".node-input-april");
+        let may = $(this).find(".node-input-may");
+        let june = $(this).find(".node-input-june");
+        let july = $(this).find(".node-input-july");
+        let august = $(this).find(".node-input-august");
+        let september = $(this).find(".node-input-september");
+        let october = $(this).find(".node-input-october");
+        let november = $(this).find(".node-input-november");
+        let december = $(this).find(".node-input-december");
+        let context = $(this).find(".node-input-context");
+
+        data.repeat.repeater = repeater.val();
+
+        if (data.repeat.repeater == "none") {
+          data.repeat.operands = [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+          ];
+        } else if (data.repeat.repeater == "daily") {
+          data.repeat.operands = [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+          ];
+          data.repeat.operands[0] = sunday.prop("checked");
+          data.repeat.operands[1] = monday.prop("checked");
+          data.repeat.operands[2] = tuesday.prop("checked");
+          data.repeat.operands[3] = wednesday.prop("checked");
+          data.repeat.operands[4] = thursday.prop("checked");
+          data.repeat.operands[5] = friday.prop("checked");
+          data.repeat.operands[6] = saturday.prop("checked");
+        } else if (data.repeat.repeater == "weekly") {
+          data.repeat.operands = [false, false, false, false];
+          data.repeat.operands[0] = week1.prop("checked");
+          data.repeat.operands[1] = week2.prop("checked");
+          data.repeat.operands[2] = week3.prop("checked");
+          data.repeat.operands[3] = week4.prop("checked");
+        } else if (data.repeat.repeater == "monthly") {
+          data.repeat.operands = [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+          ];
+          data.repeat.operands[0] = january.prop("checked");
+          data.repeat.operands[1] = february.prop("checked");
+          data.repeat.operands[2] = march.prop("checked");
+          data.repeat.operands[3] = april.prop("checked");
+          data.repeat.operands[4] = may.prop("checked");
+          data.repeat.operands[5] = june.prop("checked");
+          data.repeat.operands[6] = july.prop("checked");
+          data.repeat.operands[7] = august.prop("checked");
+          data.repeat.operands[8] = september.prop("checked");
+          data.repeat.operands[9] = october.prop("checked");
+          data.repeat.operands[10] = november.prop("checked");
+          data.repeat.operands[11] = december.prop("checked");
+        }
 
         data.output.type = outType.typedInput("type");
         if (data.output.type == "fullMsg") {
