@@ -22,180 +22,182 @@
  * SOFTWARE.
  */
 
-module.exports = function(RED)
-{
-    function ChronosFilterNode(settings)
-    {
-        const sfUtils = require("./common/sfutils.js");
+module.exports = function (RED) {
+  function TimeFilterNode(settings) {
+    const sfUtils = require("./common/sfutils.js");
 
-        let node = this;
-        RED.nodes.createNode(this, settings);
+    let node = this;
+    RED.nodes.createNode(this, settings);
 
-        node.chronos = require("./common/chronos.js");
-        node.config = RED.nodes.getNode(settings.config);
-        node.locale = require("os-locale").sync();
+    node.chronos = require("./common/chronos.js");
+    node.config = RED.nodes.getNode(settings.config);
+    node.locale = require("os-locale").sync();
 
-        if (!node.config)
-        {
-            node.status({fill: "red", shape: "dot", text: "node-red-contrib-chronos/chronos-config:common.status.noConfig"});
-            node.error(RED._("node-red-contrib-chronos/chronos-config:common.error.noConfig"));
+    if (!node.config) {
+      node.status({
+        fill: "red",
+        shape: "dot",
+        text: "maya-red-scheduler/time-config:common.status.noConfig",
+      });
+      node.error(RED._("maya-red-scheduler/time-config:common.error.noConfig"));
+    } else if (settings.conditions.length == 0) {
+      node.status({
+        fill: "red",
+        shape: "dot",
+        text: "maya-red-scheduler/time-config:common.status.noConditions",
+      });
+      node.error(
+        RED._("maya-red-scheduler/time-config:common.error.noConditions")
+      );
+    } else {
+      node.debug(
+        "Starting node with configuration '" +
+          node.config.name +
+          "' (latitude " +
+          node.config.latitude +
+          ", longitude " +
+          node.config.longitude +
+          ")"
+      );
+      node.status({});
+
+      node.baseTime = settings.baseTime;
+      node.baseTimeType = settings.baseTimeType;
+      node.conditions = settings.conditions;
+      node.allMustMatch = settings.allMustMatch;
+      node.annotateOnly = settings.annotateOnly;
+
+      // backward compatibility to v1.5.0
+      if (!node.baseTimeType) {
+        node.baseTimeType = "msgIngress";
+      }
+
+      let valid = true;
+      if (node.baseTimeType != "msgIngress" && !node.baseTime) {
+        valid = false;
+      } else {
+        for (let i = 0; i < node.conditions.length; ++i) {
+          if (!sfUtils.validateCondition(node, node.conditions[i])) {
+            valid = false;
+            break;
+          }
         }
-        else if (settings.conditions.length == 0)
-        {
-            node.status({fill: "red", shape: "dot", text: "node-red-contrib-chronos/chronos-config:common.status.noConditions"});
-            node.error(RED._("node-red-contrib-chronos/chronos-config:common.error.noConditions"));
-        }
-        else
-        {
-            node.debug("Starting node with configuration '" + node.config.name + "' (latitude " + node.config.latitude + ", longitude " + node.config.longitude + ")");
-            node.status({});
+      }
 
-            node.baseTime = settings.baseTime;
-            node.baseTimeType = settings.baseTimeType;
-            node.conditions = settings.conditions;
-            node.allMustMatch = settings.allMustMatch;
-            node.annotateOnly = settings.annotateOnly;
-
-            // backward compatibility to v1.5.0
-            if (!node.baseTimeType)
-            {
-                node.baseTimeType = "msgIngress";
+      if (!valid) {
+        node.status({
+          fill: "red",
+          shape: "dot",
+          text: "maya-red-scheduler/time-config:common.status.invalidConfig",
+        });
+        node.error(
+          RED._("maya-red-scheduler/time-config:common.error.invalidConfig")
+        );
+      } else {
+        node.on("input", (msg, send, done) => {
+          if (msg) {
+            if (!send) {
+              // Node-RED 0.x backward compatibility
+              send = () => {
+                node.send.apply(node, arguments);
+              };
             }
 
-            let valid = true;
-            if ((node.baseTimeType != "msgIngress") && !node.baseTime)
-            {
-                valid = false;
-            }
-            else
-            {
-                for (let i=0; i<node.conditions.length; ++i)
-                {
-                    if (!sfUtils.validateCondition(node, node.conditions[i]))
-                    {
-                        valid = false;
-                        break;
-                    }
+            if (!done) {
+              // Node-RED 0.x backward compatibility
+              done = () => {
+                var args = [...arguments];
+                if (args.length > 0) {
+                  args.push(msg);
+                  node.error.apply(node, args);
                 }
+              };
             }
 
-            if (!valid)
-            {
-                node.status({fill: "red", shape: "dot", text: "node-red-contrib-chronos/chronos-config:common.status.invalidConfig"});
-                node.error(RED._("node-red-contrib-chronos/chronos-config:common.error.invalidConfig"));
-            }
-            else
-            {
-                node.on("input", (msg, send, done) =>
-                {
-                    if (msg)
-                    {
-                        if (!send)  // Node-RED 0.x backward compatibility
-                        {
-                            send = () =>
-                            {
-                                node.send.apply(node, arguments);
-                            };
-                        }
+            let baseTime = sfUtils.getBaseTime(RED, node, msg);
+            if (baseTime) {
+              node.debug(
+                "Base time: " + baseTime.format("YYYY-MM-DD HH:mm:ss")
+              );
 
-                        if (!done)  // Node-RED 0.x backward compatibility
-                        {
-                            done = () =>
-                            {
-                                var args = [...arguments];
-                                if (args.length > 0)
-                                {
-                                    args.push(msg);
-                                    node.error.apply(node, args);
-                                }
-                            };
-                        }
+              let result = false;
+              let evaluation = [];
 
-                        let baseTime = sfUtils.getBaseTime(RED, node, msg);
-                        if (baseTime)
-                        {
-                            node.debug("Base time: " + baseTime.format("YYYY-MM-DD HH:mm:ss"));
+              for (let i = 0; i < node.conditions.length; ++i) {
+                try {
+                  result = sfUtils.evaluateCondition(
+                    RED,
+                    node,
+                    baseTime,
+                    node.conditions[i],
+                    i + 1
+                  );
+                } catch (e) {
+                  if (e instanceof node.chronos.TimeError) {
+                    let errMsg = RED.util.cloneMessage(msg);
 
-                            let result = false;
-                            let evaluation = [];
-
-                            for (let i=0; i<node.conditions.length; ++i)
-                            {
-                                try
-                                {
-                                    result = sfUtils.evaluateCondition(RED, node, baseTime, node.conditions[i], i+1);
-                                }
-                                catch (e)
-                                {
-                                    if (e instanceof node.chronos.TimeError)
-                                    {
-                                        let errMsg = RED.util.cloneMessage(msg);
-
-                                        if (e.details)
-                                        {
-                                            if ("errorDetails" in errMsg)
-                                            {
-                                                errMsg._errorDetails = errMsg.errorDetails;
-                                            }
-                                            errMsg.errorDetails = e.details;
-                                        }
-
-                                        node.error(e.message, errMsg);
-                                    }
-                                    else
-                                    {
-                                        node.error(e.message);
-                                        node.debug(e.stack);
-                                    }
-
-                                    // if time cannot be calculated, the condition counts as not fulfilled
-                                    result = false;
-                                }
-
-                                if (node.annotateOnly)
-                                {
-                                    evaluation.push(result);
-                                }
-                                else if ((node.allMustMatch && !result) ||
-                                        (!node.allMustMatch && result))
-                                {
-                                    break;
-                                }
-                            }
-
-                            if (node.annotateOnly)
-                            {
-                                if ("evaluation" in msg)
-                                {
-                                    msg._evaluation = msg.evaluation;
-                                }
-                                msg.evaluation = evaluation;
-
-                                node.send(msg);
-                            }
-                            else if (result)
-                            {
-                                node.send(msg);
-                            }
-                        }
-                        else
-                        {
-                            let variable = node.baseTime;
-                            if ((node.baseTimeType == "global") || (node.baseTimeType == "flow"))
-                            {
-                                let ctx = RED.util.parseContextStore(node.baseTime);
-                                variable = ctx.key + (ctx.store ? " (" + ctx.store + ")" : "");
-                            }
-
-                            node.error(RED._("node-red-contrib-chronos/chronos-config:common.error.invalidBaseTime", {baseTime: node.baseTimeType + "." + variable}), msg);
-                        }
+                    if (e.details) {
+                      if ("errorDetails" in errMsg) {
+                        errMsg._errorDetails = errMsg.errorDetails;
+                      }
+                      errMsg.errorDetails = e.details;
                     }
 
-                    done();
-                });
-            }
-        }
-    }
+                    node.error(e.message, errMsg);
+                  } else {
+                    node.error(e.message);
+                    node.debug(e.stack);
+                  }
 
-    RED.nodes.registerType("chronos-filter", ChronosFilterNode);
+                  // if time cannot be calculated, the condition counts as not fulfilled
+                  result = false;
+                }
+
+                if (node.annotateOnly) {
+                  evaluation.push(result);
+                } else if (
+                  (node.allMustMatch && !result) ||
+                  (!node.allMustMatch && result)
+                ) {
+                  break;
+                }
+              }
+
+              if (node.annotateOnly) {
+                if ("evaluation" in msg) {
+                  msg._evaluation = msg.evaluation;
+                }
+                msg.evaluation = evaluation;
+
+                node.send(msg);
+              } else if (result) {
+                node.send(msg);
+              }
+            } else {
+              let variable = node.baseTime;
+              if (
+                node.baseTimeType == "global" ||
+                node.baseTimeType == "flow"
+              ) {
+                let ctx = RED.util.parseContextStore(node.baseTime);
+                variable = ctx.key + (ctx.store ? " (" + ctx.store + ")" : "");
+              }
+
+              node.error(
+                RED._(
+                  "maya-red-scheduler/time-config:common.error.invalidBaseTime",
+                  { baseTime: node.baseTimeType + "." + variable }
+                ),
+                msg
+              );
+            }
+          }
+
+          done();
+        });
+      }
+    }
+  }
+
+  RED.nodes.registerType("time-filter", TimeFilterNode);
 };

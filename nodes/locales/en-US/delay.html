@@ -23,117 +23,117 @@ SOFTWARE.
 -->
 
 <script type="text/x-red" data-help-name="chronos-delay">
-    <p>
-        Delays each message passing through the node until a specific time
-        is reached.
-    </p>
-    <h3>Details</h3>
-    <p>
-        This node queues incoming messages until a specific time is reached,
-        which can be either manually entered or based on sun or moon position.
-        When that time has been reached, all messages in the queue are forwarded
-        to the output of the node.
-    </p>
-    <p>
-        For more information, please refer to the detailed documentation in the
-        <a href="https://github.com/jensrossbach/node-red-contrib-chronos/wiki/Delay-Until-Node">repository wiki</a>.
-    </p>
-    <h3>Configuration</h3>
-    <dl>
-        <dt>Name</dt>
-        <dd>The name of the node (optional).</dd>
-        <dt>Configuration</dt>
-        <dd>
-            A reference to the configuration node to be used.
-        </dd>
-        <dt>When</dt>
-        <dd>
-            The target time when queued messages should be forwarded. Depending
-            on the selection on the left side, the following possibilities are
-            available:
-            <ul>
-                <li>
-                    <i>Time of Day</i>: A specific time can be entered directly in the
-                    form <code>hh:mm[:ss] [am|pm]</code>.
-                </li>
-                <li>
-                    <i>Sun Position</i>: The sun position can be selected from a list
-                    of predefined values.
-                </li>
-                <li>
-                    <i>Moon Position</i>: The moon position can be selected from a list
-                    of predefined values.
-                </li>
-                <li>
-                    <i>Custom</i>: One of the user-defined sun position names can be
-                    entered.
-                </li>
-            </ul>
-        </dd>
-        <dt>Offset</dt>
-        <dd>
-            An offset between -5h and +5h can be specified in minutes. The offset
-            will be added to or substracted from the target time.
-        </dd>
-        <dt>Randomized</dt>
-        <dd>
-            When selected, the offset will be randomized between 0 and the
-            specified value.
-        </dd>
-        <dt>Preserve control properties in messages</dt>
-        <dd>
-            If selected, control properties as described below in chapter
-            <i>Input</i> are not deleted from input messages and hence still
-            be present in the messages when they are sent to the output port.
-        </dd>
-    </dl>
-    <h3>Input</h3>
-    <p>
-        The input message is forwarded as is but can also control the queueing
-        behavior of the node if the following properties are existing.
-    </p>
-    <dl class="message-properties">
-        <dt class="optional">drop<span class="property-type">any</span></dt>
-        <dd>
-            If present, all message in the queue are dropped without being
-            sent out.
-        </dd>
-        <dt class="optional">flush<span class="property-type">any</span></dt>
-        <dd>
-            If present, all message in the queue are immediately being sent
-            out.
-        </dd>
-        <dt class="optional">enqueue<span class="property-type">any</span></dt>
-        <dd>
-            Can be combined with either of the above properties. If present,
-            this message will be enqueued after dropping/flushing.
-        </dd>
-        <dt class="optional">when<span class="property-type">object</span></dt>
-        <dd>
-            Overrides the target time when queued messages should be forwarded,
-            see below for details.
-        </dd>
-    </dl>
-    <p>
-        If a property called <code>when</code> is present in the input message,
-        the target time for forwarding all currently and later enqueued messages
-        is overridden. The property must have the following content:
-    </p>
-    <dl class="message-properties">
-        <dt>type<span class="property-type">string</span></dt>
-        <dd>Target time type; one of "time", "sun", "moon" or "custom"</dd>
-        <dt>value<span class="property-type">string | number</span></dt>
-        <dd>Target time value; content is depending on target time type</dd>
-        <dt>offset<span class="property-type">number</span></dt>
-        <dd>Offset to the target time</dd>
-        <dt>random<span class="property-type">boolean</span></dt>
-        <dd>Randomized offset</dd>
-    </dl>
-    <h3>Outputs</h3>
-    <p>
-        Delayed messages are sent to the output when the target time has been
-        reached or when a message with the <code>flush</code> property is
-        received. If a message with the <code>drop</code> property is received,
-        the messages are discarded.
-    </p>
+  <p>
+      Delays each message passing through the node until a specific time
+      is reached.
+  </p>
+  <h3>Details</h3>
+  <p>
+      This node queues incoming messages until a specific time is reached,
+      which can be either manually entered or based on sun or moon position.
+      When that time has been reached, all messages in the queue are forwarded
+      to the output of the node.
+  </p>
+  <p>
+      For more information, please refer to the detailed documentation in the
+      <a href="https://github.com/mayahq/maya-red-scheduler/wiki/Delay-Until-Node">repository wiki</a>.
+  </p>
+  <h3>Configuration</h3>
+  <dl>
+      <dt>Name</dt>
+      <dd>The name of the node (optional).</dd>
+      <dt>Configuration</dt>
+      <dd>
+          A reference to the configuration node to be used.
+      </dd>
+      <dt>When</dt>
+      <dd>
+          The target time when queued messages should be forwarded. Depending
+          on the selection on the left side, the following possibilities are
+          available:
+          <ul>
+              <li>
+                  <i>Time of Day</i>: A specific time can be entered directly in the
+                  form <code>hh:mm[:ss] [am|pm]</code>.
+              </li>
+              <li>
+                  <i>Sun Position</i>: The sun position can be selected from a list
+                  of predefined values.
+              </li>
+              <li>
+                  <i>Moon Position</i>: The moon position can be selected from a list
+                  of predefined values.
+              </li>
+              <li>
+                  <i>Custom</i>: One of the user-defined sun position names can be
+                  entered.
+              </li>
+          </ul>
+      </dd>
+      <dt>Offset</dt>
+      <dd>
+          An offset between -5h and +5h can be specified in minutes. The offset
+          will be added to or substracted from the target time.
+      </dd>
+      <dt>Randomized</dt>
+      <dd>
+          When selected, the offset will be randomized between 0 and the
+          specified value.
+      </dd>
+      <dt>Preserve control properties in messages</dt>
+      <dd>
+          If selected, control properties as described below in chapter
+          <i>Input</i> are not deleted from input messages and hence still
+          be present in the messages when they are sent to the output port.
+      </dd>
+  </dl>
+  <h3>Input</h3>
+  <p>
+      The input message is forwarded as is but can also control the queueing
+      behavior of the node if the following properties are existing.
+  </p>
+  <dl class="message-properties">
+      <dt class="optional">drop<span class="property-type">any</span></dt>
+      <dd>
+          If present, all message in the queue are dropped without being
+          sent out.
+      </dd>
+      <dt class="optional">flush<span class="property-type">any</span></dt>
+      <dd>
+          If present, all message in the queue are immediately being sent
+          out.
+      </dd>
+      <dt class="optional">enqueue<span class="property-type">any</span></dt>
+      <dd>
+          Can be combined with either of the above properties. If present,
+          this message will be enqueued after dropping/flushing.
+      </dd>
+      <dt class="optional">when<span class="property-type">object</span></dt>
+      <dd>
+          Overrides the target time when queued messages should be forwarded,
+          see below for details.
+      </dd>
+  </dl>
+  <p>
+      If a property called <code>when</code> is present in the input message,
+      the target time for forwarding all currently and later enqueued messages
+      is overridden. The property must have the following content:
+  </p>
+  <dl class="message-properties">
+      <dt>type<span class="property-type">string</span></dt>
+      <dd>Target time type; one of "time", "sun", "moon" or "custom"</dd>
+      <dt>value<span class="property-type">string | number</span></dt>
+      <dd>Target time value; content is depending on target time type</dd>
+      <dt>offset<span class="property-type">number</span></dt>
+      <dd>Offset to the target time</dd>
+      <dt>random<span class="property-type">boolean</span></dt>
+      <dd>Randomized offset</dd>
+  </dl>
+  <h3>Outputs</h3>
+  <p>
+      Delayed messages are sent to the output when the target time has been
+      reached or when a message with the <code>flush</code> property is
+      received. If a message with the <code>drop</code> property is received,
+      the messages are discarded.
+  </p>
 </script>

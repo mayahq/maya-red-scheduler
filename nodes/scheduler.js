@@ -23,7 +23,7 @@
  */
 
 module.exports = function (RED) {
-  function ChronosSchedulerNode(settings) {
+  function TimeSchedulerNode(settings) {
     const chronos = require("./common/chronos.js");
 
     let node = this;
@@ -36,11 +36,9 @@ module.exports = function (RED) {
       node.status({
         fill: "red",
         shape: "dot",
-        text: "node-red-contrib-chronos/chronos-config:common.status.noConfig",
+        text: "maya-red-scheduler/time-config:common.status.noConfig",
       });
-      node.error(
-        RED._("node-red-contrib-chronos/chronos-config:common.error.noConfig")
-      );
+      node.error(RED._("maya-red-scheduler/time-config:common.error.noConfig"));
     } else if (
       Number.isNaN(node.config.latitude) ||
       Number.isNaN(node.config.longitude)
@@ -48,13 +46,10 @@ module.exports = function (RED) {
       node.status({
         fill: "red",
         shape: "dot",
-        text:
-          "node-red-contrib-chronos/chronos-config:common.status.invalidConfig",
+        text: "maya-red-scheduler/time-config:common.status.invalidConfig",
       });
       node.error(
-        RED._(
-          "node-red-contrib-chronos/chronos-config:common.error.invalidConfig"
-        )
+        RED._("maya-red-scheduler/time-config:common.error.invalidConfig")
       );
     } else if (settings.schedule.length == 0) {
       node.status({
@@ -80,7 +75,6 @@ module.exports = function (RED) {
         typeof settings.disabled == "undefined" ? false : settings.disabled;
 
       node.schedule = [];
-      console.log(settings.schedule);
       for (let i = 0; i < settings.schedule.length; ++i) {
         node.schedule.push({
           id: i + 1,
@@ -110,10 +104,19 @@ module.exports = function (RED) {
       for (let i = 0; i < node.schedule.length; ++i) {
         let event = node.schedule[i].config;
 
+        if (event.trigger.dateType == "date") {
+          if (!chronos.isValidUserDate(event.trigger.dateValue)) {
+            valid = false;
+            break;
+          }
+        }
+
         // check for presence of variable name
+        // console.log(event.trigger.dateType, event.trigger.dateValue);
         if (
-          (event.trigger.type == "global" || event.trigger.type == "flow") &&
-          !event.trigger.value
+          (event.trigger.timeType == "global" ||
+            event.trigger.timeType == "flow") &&
+          !event.trigger.timeValue
         ) {
           valid = false;
           break;
@@ -121,8 +124,8 @@ module.exports = function (RED) {
 
         // check for valid user time
         if (
-          event.trigger.type == "time" &&
-          !chronos.isValidUserTime(event.trigger.value)
+          event.trigger.timeType == "time" &&
+          !chronos.isValidUserTime(event.trigger.timeValue)
         ) {
           valid = false;
           break;
@@ -193,13 +196,10 @@ module.exports = function (RED) {
         node.status({
           fill: "red",
           shape: "dot",
-          text:
-            "node-red-contrib-chronos/chronos-config:common.status.invalidConfig",
+          text: "maya-red-scheduler/time-config:common.status.invalidConfig",
         });
         node.error(
-          RED._(
-            "node-red-contrib-chronos/chronos-config:common.error.invalidConfig"
-          )
+          RED._("maya-red-scheduler/time-config:common.error.invalidConfig")
         );
       } else {
         updateStatus();
@@ -274,6 +274,7 @@ module.exports = function (RED) {
       node.debug("Starting timers");
 
       node.schedule.forEach((data) => {
+        console.log(data);
         startTimer(data);
       });
     }
@@ -290,15 +291,15 @@ module.exports = function (RED) {
       stopTimer(data);
 
       if (
-        data.config.trigger.type == "global" ||
-        data.config.trigger.type == "flow"
+        data.config.trigger.timeType == "global" ||
+        data.config.trigger.timeType == "flow"
       ) {
-        let ctx = RED.util.parseContextStore(data.config.trigger.value);
+        let ctx = RED.util.parseContextStore(data.config.trigger.timeValue);
         node.debug(
           "[Timer:" +
             data.id +
             "] Load trigger from context variable " +
-            data.config.trigger.type +
+            data.config.trigger.timeType +
             "." +
             ctx.key +
             (ctx.store ? " (" + ctx.store + ")" : "")
@@ -306,7 +307,7 @@ module.exports = function (RED) {
 
         let ctxData = node
           .context()
-          [data.config.trigger.type].get(ctx.key, ctx.store);
+          [data.config.trigger.timeType].get(ctx.key, ctx.store);
 
         if (validateExtendedContextData(ctxData)) {
           node.debug(
@@ -331,7 +332,7 @@ module.exports = function (RED) {
           node.error(
             RED._("scheduler.error.invalidEvent", {
               event:
-                data.config.trigger.type +
+                data.config.trigger.timeType +
                 "." +
                 ctx.key +
                 (ctx.store ? " (" + ctx.store + ")" : ""),
@@ -383,16 +384,17 @@ module.exports = function (RED) {
           RED,
           node,
           repeat ? now.clone().add(1, "days") : now.clone(),
-          data.config.trigger.type,
-          data.config.trigger.value
+          data.config.trigger.timeType,
+          data.config.trigger.timeValue
         );
 
-        if (data.config.trigger.offset != 0) {
-          let offset = data.config.trigger.random
-            ? Math.round(Math.random() * data.config.trigger.offset)
-            : data.config.trigger.offset;
-          triggerTime.add(offset, "minutes");
-        }
+        // let triggerDate = chronos.getUserDate(
+        //   RED,
+        //   node,
+        //   repeat ? now.clone().add(1, "days") : now.clone(),
+        //   data.config.trigger.dateType,
+        //   data.config.trigger.dateValue
+        // );
 
         if (triggerTime.isBefore(now)) {
           node.debug(
@@ -401,15 +403,15 @@ module.exports = function (RED) {
               "] Trigger time before current time, adding one day"
           );
 
-          if (data.config.trigger.type == "time") {
+          if (data.config.trigger.timeType == "time") {
             triggerTime.add(1, "days");
           } else {
             triggerTime = chronos.getTime(
               RED,
               node,
               triggerTime.add(1, "days"),
-              data.config.trigger.type,
-              data.config.trigger.value
+              data.config.trigger.timeType,
+              data.config.trigger.timeValue
             );
           }
         }
@@ -513,18 +515,6 @@ module.exports = function (RED) {
         return false;
       }
 
-      if (
-        typeof data.offset != "number" ||
-        data.offset < -300 ||
-        data.offset > 300
-      ) {
-        return false;
-      }
-
-      if (typeof data.random != "boolean") {
-        return false;
-      }
-
       return true;
     }
 
@@ -595,5 +585,5 @@ module.exports = function (RED) {
     }
   }
 
-  RED.nodes.registerType("chronos-scheduler", ChronosSchedulerNode);
+  RED.nodes.registerType("time-scheduler", TimeSchedulerNode);
 };

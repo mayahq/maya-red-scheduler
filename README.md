@@ -1,13 +1,15 @@
-# node-red-contrib-chronos
+# maya-red-chronos
 
 <a href="https://www.npmjs.com/package/node-red-contrib-chronos"><img title="npm version" src="https://badgen.net/npm/v/node-red-contrib-chronos"></a>
 <a href="https://www.npmjs.com/package/node-red-contrib-chronos"><img title="npm downloads" src="https://badgen.net/npm/dt/node-red-contrib-chronos"></a>
 
+This is a custom fork of Jens Rossbach's excellent [chronos](https://github.com/jensrossbach/node-red-contrib-chronos) package, with mods to make it dynamically schedule events in Maya's context + repeated scheduling.
+
 A collection of Node-RED nodes for date and time based scheduling, queueing, routing, filtering and manipulating. Automatically calculated times from sun events (sunrise, sunset, dusk, dawn, ...) or moon events (moonrise, moonset) are supported as well.
 
-If you encountered a bug, would like to propose a new feature or simply want to share your opinion about the software, please have a look at the [contribution guide](https://github.com/jensrossbach/node-red-contrib-chronos/blob/master/CONTRIBUTING.md) on the GitHub repository to learn more about how to contribute to this project. If you need help or have questions, please check out the [instructions for getting support](https://github.com/jensrossbach/node-red-contrib-chronos/blob/master/SUPPORT.md).
+If you encountered a bug, would like to propose a new feature or simply want to share your opinion about the software, please have a look at the [contribution guide](https://github.com/mayahq/maya-red-scheduler/blob/master/CONTRIBUTING.md) on the GitHub repository to learn more about how to contribute to this project. If you need help or have questions, please check out the [instructions for getting support](https://github.com/mayahq/maya-red-scheduler/blob/master/SUPPORT.md).
 
-To see what has changed in recent versions of the software, please have a look at the project's [change log](https://github.com/jensrossbach/node-red-contrib-chronos/blob/master/CHANGELOG.md).
+To see what has changed in recent versions of the software, please have a look at the project's [change log](https://github.com/mayahq/maya-red-scheduler/blob/master/CHANGELOG.md).
 
 #### Scheduler
 Schedules the transmission of messages or setting of global/flow variables at specific times.
@@ -37,7 +39,7 @@ Modifies time values in messages or context stores.
 ## Documentation
 The detailed documentation of each node is available in the wiki of the GitHub repository.
 
-**&rarr; [Documentation](https://github.com/jensrossbach/node-red-contrib-chronos/wiki)**
+**&rarr; [Documentation](https://github.com/mayahq/maya-red-scheduler/wiki)**
 
 ## License
 Copyright (c) 2021 Jens-Uwe Rossbach
@@ -63,6 +65,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ## Attribution
+
+This is a custom fork of Jens Rossbach's excellent [chronos](https://github.com/jensrossbach/node-red-contrib-chronos) package, with mods to make it dynamically schedule events in Maya's context + repeated scheduling.
+
 The following icons have been taken from Node-RED provided nodes:
 * Timer icon (Node-RED delay node)
 * Switch icon (Node-RED switch node)

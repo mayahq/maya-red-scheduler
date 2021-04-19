@@ -22,14 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 
-<script type="text/x-red" data-template-name="chronos-scheduler">
+<script type="text/x-red" data-template-name="time-scheduler">
   <div class="form-row">
-      <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.name"></span></label>
-      <input type="text" id="node-input-name" data-i18n="[placeholder]node-red-contrib-chronos/chronos-config:common.label.name">
+      <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.name"></span></label>
+      <input type="text" id="node-input-name" data-i18n="[placeholder]maya-red-scheduler/time-config:common.label.name">
   </div>
   <div class="form-row">
-      <label for="node-input-config"><i class="fa fa-cog"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.config"></span></label>
-      <input type="text" id="node-input-config" data-i18n="[placeholder]node-red-contrib-chronos/chronos-config:common.label.config">
+      <label for="node-input-config"><i class="fa fa-cog"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.config"></span></label>
+      <input type="text" id="node-input-config" data-i18n="[placeholder]maya-red-scheduler/time-config:common.label.config">
   </div>
   <div class="form-row node-input-scheduleList-row" style="padding-top: 10px">
       <label for="node-input-scheduleList"><i class="fa fa-calendar-o"></i> <span data-i18n="scheduler.label.schedule"></span></label>
@@ -48,8 +48,8 @@ SOFTWARE.
 </script>
 
 <script type="text/javascript">
-  RED.nodes.registerType("chronos-scheduler", {
-    category: "chronos",
+  RED.nodes.registerType("time-scheduler", {
+    category: "scheduling",
     color: "#DEB887",
     icon: "chronos_scheduler.svg",
     inputs: 1,
@@ -78,16 +78,25 @@ SOFTWARE.
       },
       config: {
         value: "",
-        type: "chronos-config",
+        type: "time-config",
         required: true,
       },
       schedule: {
         value: [
           {
-            trigger: { type: "time", value: "", offset: 0, random: false },
+            trigger: {
+              timeType: "time",
+              timeValue: "",
+              dateType: "now",
+              dateValue: "",
+            },
             output: {
               type: "msg",
               property: { name: "payload", type: "str", value: "" },
+            },
+            repeat: {
+              repeater: "none",
+              operands: [],
             },
           },
         ],
@@ -120,85 +129,85 @@ SOFTWARE.
               {
                 value: "sunrise",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.sunrise"
+                  "maya-red-scheduler/time-config:common.list.sun.sunrise"
                 ),
               },
               {
                 value: "sunriseEnd",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.sunriseEnd"
+                  "maya-red-scheduler/time-config:common.list.sun.sunriseEnd"
                 ),
               },
               {
                 value: "sunsetStart",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.sunsetStart"
+                  "maya-red-scheduler/time-config:common.list.sun.sunsetStart"
                 ),
               },
               {
                 value: "sunset",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.sunset"
+                  "maya-red-scheduler/time-config:common.list.sun.sunset"
                 ),
               },
               {
                 value: "goldenHour",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.goldenHour"
+                  "maya-red-scheduler/time-config:common.list.sun.goldenHour"
                 ),
               },
               {
                 value: "goldenHourEnd",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.goldenHourEnd"
+                  "maya-red-scheduler/time-config:common.list.sun.goldenHourEnd"
                 ),
               },
               {
                 value: "night",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.night"
+                  "maya-red-scheduler/time-config:common.list.sun.night"
                 ),
               },
               {
                 value: "nightEnd",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.nightEnd"
+                  "maya-red-scheduler/time-config:common.list.sun.nightEnd"
                 ),
               },
               {
                 value: "dawn",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.dawn"
+                  "maya-red-scheduler/time-config:common.list.sun.dawn"
                 ),
               },
               {
                 value: "nauticalDawn",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.nauticalDawn"
+                  "maya-red-scheduler/time-config:common.list.sun.nauticalDawn"
                 ),
               },
               {
                 value: "dusk",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.dusk"
+                  "maya-red-scheduler/time-config:common.list.sun.dusk"
                 ),
               },
               {
                 value: "nauticalDusk",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.nauticalDusk"
+                  "maya-red-scheduler/time-config:common.list.sun.nauticalDusk"
                 ),
               },
               {
                 value: "solarNoon",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.solarNoon"
+                  "maya-red-scheduler/time-config:common.list.sun.solarNoon"
                 ),
               },
               {
                 value: "nadir",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.nadir"
+                  "maya-red-scheduler/time-config:common.list.sun.nadir"
                 ),
               },
             ];
@@ -207,41 +216,50 @@ SOFTWARE.
               {
                 value: "rise",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.moon.rise"
+                  "maya-red-scheduler/time-config:common.list.moon.rise"
                 ),
               },
               {
                 value: "set",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.moon.set"
+                  "maya-red-scheduler/time-config:common.list.moon.set"
                 ),
               },
             ];
 
             const timeInput = {
               value: "time",
-              label: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.time"
-              ),
+              label: node._("maya-red-scheduler/time-config:common.label.time"),
               icon: "fa fa-clock-o",
               hasValue: true,
               validate: /^(\d|0\d|1\d|2[0-3]):([0-5]\d)(:([0-5]\d))?\s*(am|AM|pm|PM)?$/,
             };
 
+            const dateInput = {
+              value: "date",
+              label: node._("scheduler.label.date"),
+              icon: "fa fa-calendar",
+              hasValue: true,
+              validate: /^([2-9]\d\d\d)-([1-9]|0[1-9]|1[0-2])-([1-9]|0[1-9]|[12]\d|3[01])$/,
+            };
+
+            const nowInput = {
+              value: "now",
+              label: node._("scheduler.label.now"),
+              icon: "fa fa-clock-o",
+              hasValue: false,
+            };
+
             const sunTimeInput = {
               value: "sun",
-              label: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.sun"
-              ),
+              label: node._("maya-red-scheduler/time-config:common.label.sun"),
               icon: "fa fa-sun-o",
               options: sunTimes,
             };
 
             const moonTimeInput = {
               value: "moon",
-              label: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.moon"
-              ),
+              label: node._("maya-red-scheduler/time-config:common.label.moon"),
               icon: "fa fa-moon-o",
               options: moonTimes,
             };
@@ -249,7 +267,7 @@ SOFTWARE.
             const customInput = {
               value: "custom",
               label: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.custom"
+                "maya-red-scheduler/time-config:common.label.custom"
               ),
               icon: "fa fa-wrench",
               hasValue: true,
@@ -259,25 +277,9 @@ SOFTWARE.
             const fullMessageInput = {
               value: "fullMsg",
               label: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.fullMessage"
+                "maya-red-scheduler/time-config:common.label.fullMessage"
               ),
               hasValue: false,
-            };
-
-            const offsetInput = {
-              min: -300,
-              max: 300,
-              step: 5,
-              change: function (event, ui) {
-                var value = parseInt($(this).spinner("value"), 10);
-                var min = $(this).spinner("option", "min");
-                var max = $(this).spinner("option", "max");
-                if (isNaN(value) || value < min) {
-                  $(this).spinner("value", min);
-                } else if (value > max) {
-                  $(this).spinner("value", max);
-                }
-              },
             };
 
             let fragment = document.createDocumentFragment();
@@ -285,10 +287,14 @@ SOFTWARE.
             let outputRow = $("<div/>", {
               style: "margin-top: 5px; ",
             }).appendTo(fragment);
+            let repeatRow = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-top : 5px;",
+            }).appendTo(fragment);
 
-            let triggerType = $("<input/>", {
+            let triggerTime = $("<input/>", {
               type: "text",
-              class: "node-input-triggerType",
+              class: "node-input-triggerTime",
             })
               .appendTo(triggerRow)
               .typedInput({
@@ -301,56 +307,34 @@ SOFTWARE.
                   "flow",
                 ],
               });
-            triggerType.typedInput("width", "280px");
-            triggerType._prevType = "time";
+            triggerTime.typedInput("width", "220px");
+            triggerTime._prevType = "time";
 
-            let offsetBox = $("<div/>", {
-              style: "display: inline-block;",
-            }).appendTo(triggerRow);
-            let offsetLabel = $("<label/>", {
-              title: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.offset"
-              ),
-              style: "display: inline-block; width: auto; margin-bottom: 0px;",
+            let triggerDate = $("<input/>", {
+              type: "text",
+              class: "node-input-triggerDate",
+              style: "margin-left : 5px;",
             })
-              .html(
-                "<span style='margin-left: 6px; margin-right: 6px;'>&#8597;</span>"
-              )
-              .appendTo(offsetBox);
-            let triggerOffset = $("<input/>", {
-              class: "node-input-triggerOffset",
-              style: "width: 50px;",
-            })
-              .appendTo(offsetLabel)
-              .spinner(offsetInput);
-            let randomLabel = $("<label/>", {
-              title: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.random"
-              ),
-              style: "width: auto; margin-left: 10px; margin-bottom: 0px;",
-            })
-              .html("<i class='fa fa-random' aria-hidden='true'></i>")
-              .appendTo(offsetBox);
-            let triggerRandom = $("<input/>", {
-              type: "checkbox",
-              class: "node-input-triggerRandom",
-              style:
-                "width: auto; margin-left: 4px; margin-top: 0px; margin-bottom: 3px;",
-            }).appendTo(randomLabel);
+              .appendTo(triggerRow)
+              .typedInput({ types: [nowInput, dateInput] });
+            triggerDate.typedInput("width", "220px");
+            triggerDate._prevType = "date";
 
             $("<div/>", {
-              style: "display: inline-block; width: auto; margin-left: 20px;",
+              style: "display: inline-block; width: auto; ",
             })
               .text(node._("scheduler.label.output"))
               .appendTo(outputRow);
 
             let outputBox = $("<div/>", {
               style:
-                "display: inline-block; vertical-align: middle; width: auto; margin-left: 8px;",
+                "display: inline-flex; vertical-align: middle; width: auto; margin-left: 8px;",
             }).appendTo(outputRow);
-            let outTypeRow = $("<div/>").appendTo(outputBox);
+            let outTypeRow = $("<div/>", {
+              style: "margin-left: 5px; ",
+            }).appendTo(outputBox);
             let outValueRow = $("<div/>", {
-              style: "margin-top: 5px; ",
+              style: "margin-left: 5px; ",
             }).appendTo(outputBox);
 
             let outType = $("<input/>", {
@@ -361,7 +345,7 @@ SOFTWARE.
               .typedInput({
                 types: ["global", "flow", "msg", fullMessageInput],
               });
-            outType.typedInput("width", "280px");
+            outType.typedInput("width", "190px");
             outType._prevType = "global";
             let propValue = $("<input/>", {
               type: "text",
@@ -371,7 +355,7 @@ SOFTWARE.
               .typedInput({
                 types: ["str", "num", "bool", "json", "bin", "date"],
               });
-            propValue.typedInput("width", "280px");
+            propValue.typedInput("width", "190px");
             let msgValue = $("<input/>", {
               type: "text",
               class: "node-input-msgValue",
@@ -380,19 +364,423 @@ SOFTWARE.
               .typedInput({ types: ["json"] });
             msgValue.typedInput("width", "280px");
 
-            triggerType.on("change", function () {
-              let type = triggerType.typedInput("type");
-              if (type === "global" || type === "flow") {
-                offsetBox.hide();
-              } else {
-                offsetBox.show();
-              }
+            let repeater = $("<select/>", {
+              class: "node-input-repeater",
+              style: "width: 120px; ",
+            }).appendTo(repeatRow);
+            let repeatGrp = $("<optgroup></optgroup>")
+              .attr(
+                "label",
+                node._(
+                  "maya-red-scheduler/time-config:common.list.repeater.label"
+                )
+              )
+              .append(
+                $("<option></option>")
+                  .val("none")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.repeater.list.none"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("hourly")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.repeater.list.hourly"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("daily")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.repeater.list.daily"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("weekly")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.repeater.list.weekly"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("monthly")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.repeater.list.monthly"
+                    )
+                  )
+              )
+              .appendTo(repeater);
+            let daysBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;",
+            }).appendTo(repeatRow);
 
-              if (type != triggerType._prevType) {
-                triggerType._prevType = type;
-                if (type != "sun" && type != "moon") {
-                  triggerType.typedInput("value", "");
-                }
+            let monday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-monday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.monday"
+                )
+              )
+              .appendTo(daysBox);
+            let tuesday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-tuesday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.tuesday"
+                )
+              )
+              .appendTo(daysBox);
+            let wednesday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-wednesday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.wednesday"
+                )
+              )
+              .appendTo(daysBox);
+            let thursday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-thursday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.thursday"
+                )
+              )
+              .appendTo(daysBox);
+            let friday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-friday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.friday"
+                )
+              )
+              .appendTo(daysBox);
+            let saturday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-saturday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.saturday"
+                )
+              )
+              .appendTo(daysBox);
+            let sunday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-sunday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(daysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.sunday"
+                )
+              )
+              .appendTo(daysBox);
+
+            let monthsBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;",
+            }).appendTo(repeatRow);
+
+            let monthsRow1 = $("<div/>").appendTo(monthsBox);
+            let monthsRow2 = $("<div/>", {
+              style: "margin-top: 5px;",
+            }).appendTo(monthsBox);
+            let monthsRow3 = $("<div/>", {
+              style: "margin-top: 5px;",
+            }).appendTo(monthsBox);
+
+            let january = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-january",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.january"
+                )
+              )
+              .appendTo(monthsRow1);
+            let february = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-february",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.february"
+                )
+              )
+              .appendTo(monthsRow1);
+            let march = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-march",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.march")
+              )
+              .appendTo(monthsRow1);
+            let april = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-april",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.april")
+              )
+              .appendTo(monthsRow1);
+            let may = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-may",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.may")
+              )
+              .appendTo(monthsRow2);
+            let june = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-june",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.june")
+              )
+              .appendTo(monthsRow2);
+            let july = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-july",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.july")
+              )
+              .appendTo(monthsRow2);
+            let august = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-august",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.august"
+                )
+              )
+              .appendTo(monthsRow2);
+            let september = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-september",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.september"
+                )
+              )
+              .appendTo(monthsRow3);
+            let october = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-october",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.october"
+                )
+              )
+              .appendTo(monthsRow3);
+            let november = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-november",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.november"
+                )
+              )
+              .appendTo(monthsRow3);
+            let december = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-december",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.december"
+                )
+              )
+              .appendTo(monthsRow3);
+
+            let weeksBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;",
+            }).appendTo(repeatRow);
+
+            let week1 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-week1",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weeksBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text("wk 1")
+              .appendTo(weeksBox);
+
+            let week2 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-week2",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weeksBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text("wk 2")
+              .appendTo(weeksBox);
+            let week3 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-week3",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weeksBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text("wk 3")
+              .appendTo(weeksBox);
+
+            let week4 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-week4",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weeksBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text("wk 4")
+              .appendTo(weeksBox);
+
+            triggerTime.on("change", function () {
+              let type = triggerTime.typedInput("type");
+
+              if (type != triggerTime._prevType) {
+                triggerTime._prevType = type;
+              }
+            });
+
+            triggerDate.on("change", function () {
+              let type = triggerDate.typedInput("type");
+
+              if (type != triggerDate._prevType) {
+                triggerDate._prevType = type;
               }
             });
 
@@ -412,12 +800,44 @@ SOFTWARE.
               }
             });
 
+            repeater.change(function () {
+              daysBox.hide();
+              monthsBox.hide();
+              weeksBox.hide();
+
+              var value = $(this).val();
+              switch (value) {
+                case "daily": {
+                  daysBox.show();
+                  break;
+                }
+                case "weekly": {
+                  weeksBox.show();
+                  break;
+                }
+                case "monthly": {
+                  monthsBox.show();
+                  break;
+                }
+              }
+            });
+
             if (!("trigger" in data)) {
               data = {
-                trigger: { type: "time", value: "", offset: 0, random: false },
+                trigger: {
+                  timeType: "time",
+                  timeValue: "",
+                  dateType: "now",
+                  dateValue: "",
+                },
                 output: {
                   type: "msg",
                   property: { name: "payload", type: "str", value: "" },
+                },
+                repeat: {
+                  repeater: "none",
+                  operands: [],
+                  label: "",
                 },
               };
             } else if (!("type" in data.output)) {
@@ -426,15 +846,52 @@ SOFTWARE.
                 type: "msg",
                 property: { name: "payload", type: "str", value: "" },
               };
+            } else if (!("repeat" in data)) {
+              data.repeat = {
+                repeater: "none",
+                operands: [],
+                label: "",
+              };
             }
 
-            triggerType.typedInput("value", data.trigger.value);
-            triggerType._prevType = data.trigger.type;
-            triggerType.typedInput("type", data.trigger.type);
+            repeater.val(data.repeat.repeater);
 
-            if (data.trigger.type != "global" && data.trigger.type != "flow") {
-              triggerOffset.spinner("value", data.trigger.offset);
-              triggerRandom.prop("checked", data.trigger.random);
+            if (data.repeat.repeater == "daily") {
+              sunday.prop("checked", data.repeat.operands[0]);
+              monday.prop("checked", data.repeat.operands[1]);
+              tuesday.prop("checked", data.repeat.operands[2]);
+              wednesday.prop("checked", data.repeat.operands[3]);
+              thursday.prop("checked", data.repeat.operands[4]);
+              friday.prop("checked", data.repeat.operands[5]);
+              saturday.prop("checked", data.repeat.operands[6]);
+            } else if (data.repeat.repeater == "weekly") {
+              week1.prop("checked", data.repeat.operands[0]);
+              week2.prop("checked", data.repeat.operands[1]);
+              week3.prop("checked", data.repeat.operands[2]);
+              week4.prop("checked", data.repeat.operands[3]);
+            } else if (data.repeat.repeater == "monthly") {
+              january.prop("checked", data.repeat.operands[0]);
+              february.prop("checked", data.repeat.operands[1]);
+              march.prop("checked", data.repeat.operands[2]);
+              april.prop("checked", data.repeat.operands[3]);
+              may.prop("checked", data.repeat.operands[4]);
+              june.prop("checked", data.repeat.operands[5]);
+              july.prop("checked", data.repeat.operands[6]);
+              august.prop("checked", data.repeat.operands[7]);
+              september.prop("checked", data.repeat.operands[8]);
+              october.prop("checked", data.repeat.operands[9]);
+              november.prop("checked", data.repeat.operands[10]);
+              december.prop("checked", data.repeat.operands[11]);
+            }
+
+            triggerTime.typedInput("value", data.trigger.timeValue);
+            triggerTime._prevType = data.trigger.timeType;
+            triggerTime.typedInput("type", data.trigger.timeType);
+
+            triggerDate._prevType = data.trigger.dateType;
+            triggerDate.typedInput("type", data.trigger.dateType);
+            if (data.trigger.dateType == "date") {
+              triggerDate.typedInput("value", data.trigger.dateValue);
             }
 
             if (data.output.type == "fullMsg") {
@@ -446,12 +903,13 @@ SOFTWARE.
             }
             outType._prevType = data.output.type;
             outType.typedInput("type", data.output.type);
-
+            repeater.change();
             item[0].appendChild(fragment);
           },
         });
 
       node.schedule.forEach((data) => {
+        console.log("on prepare item:", data);
         scheduleList.editableList("addItem", data);
       });
     },
@@ -464,21 +922,112 @@ SOFTWARE.
       node.outputs = 0;
 
       scheduleList.each(function (index) {
-        let data = { trigger: {}, output: {} };
+        let data = { trigger: {}, output: {}, repeat: {} };
 
-        let triggerType = $(this).find(".node-input-triggerType");
-        let triggerOffset = $(this).find(".node-input-triggerOffset");
-        let triggerRandom = $(this).find(".node-input-triggerRandom");
+        let triggerTime = $(this).find(".node-input-triggerTime");
+        let triggerDate = $(this).find(".node-input-triggerDate");
+
         let outType = $(this).find(".node-input-outType");
         let propValue = $(this).find(".node-input-propValue");
         let msgValue = $(this).find(".node-input-msgValue");
 
-        data.trigger.type = triggerType.typedInput("type");
-        data.trigger.value = triggerType.typedInput("value");
+        data.trigger.timeType = triggerTime.typedInput("type");
+        data.trigger.timeValue = triggerTime.typedInput("value");
 
-        if (data.trigger.type != "global" && data.trigger.type != "flow") {
-          data.trigger.offset = triggerOffset.spinner("value");
-          data.trigger.random = triggerRandom.prop("checked");
+        data.trigger.dateType = triggerDate.typedInput("type");
+        data.trigger.dateValue = triggerDate.typedInput("value");
+
+        let repeater = $(this).find(".node-input-repeater");
+        //Get day ticks
+        let monday = $(this).find(".node-input-monday");
+        let tuesday = $(this).find(".node-input-tuesday");
+        let wednesday = $(this).find(".node-input-wednesday");
+        let thursday = $(this).find(".node-input-thursday");
+        let friday = $(this).find(".node-input-friday");
+        let saturday = $(this).find(".node-input-saturday");
+        let sunday = $(this).find(".node-input-sunday");
+        // Get weekly ticks
+        let week1 = $(this).find(".node-input-week1");
+        let week2 = $(this).find(".node-input-week2");
+        let week3 = $(this).find(".node-input-week3");
+        let week4 = $(this).find(".node-input-week4");
+        // Get monthly ticks
+        let january = $(this).find(".node-input-january");
+        let february = $(this).find(".node-input-february");
+        let march = $(this).find(".node-input-march");
+        let april = $(this).find(".node-input-april");
+        let may = $(this).find(".node-input-may");
+        let june = $(this).find(".node-input-june");
+        let july = $(this).find(".node-input-july");
+        let august = $(this).find(".node-input-august");
+        let september = $(this).find(".node-input-september");
+        let october = $(this).find(".node-input-october");
+        let november = $(this).find(".node-input-november");
+        let december = $(this).find(".node-input-december");
+        let context = $(this).find(".node-input-context");
+
+        data.repeat.repeater = repeater.val();
+
+        if (data.repeat.repeater == "none") {
+          data.repeat.operands = [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+          ];
+        } else if (data.repeat.repeater == "daily") {
+          data.repeat.operands = [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+          ];
+          data.repeat.operands[0] = sunday.prop("checked");
+          data.repeat.operands[1] = monday.prop("checked");
+          data.repeat.operands[2] = tuesday.prop("checked");
+          data.repeat.operands[3] = wednesday.prop("checked");
+          data.repeat.operands[4] = thursday.prop("checked");
+          data.repeat.operands[5] = friday.prop("checked");
+          data.repeat.operands[6] = saturday.prop("checked");
+        } else if (data.repeat.repeater == "weekly") {
+          data.repeat.operands = [false, false, false, false];
+          data.repeat.operands[0] = week1.prop("checked");
+          data.repeat.operands[1] = week2.prop("checked");
+          data.repeat.operands[2] = week3.prop("checked");
+          data.repeat.operands[3] = week4.prop("checked");
+        } else if (data.repeat.repeater == "monthly") {
+          data.repeat.operands = [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+          ];
+          data.repeat.operands[0] = january.prop("checked");
+          data.repeat.operands[1] = february.prop("checked");
+          data.repeat.operands[2] = march.prop("checked");
+          data.repeat.operands[3] = april.prop("checked");
+          data.repeat.operands[4] = may.prop("checked");
+          data.repeat.operands[5] = june.prop("checked");
+          data.repeat.operands[6] = july.prop("checked");
+          data.repeat.operands[7] = august.prop("checked");
+          data.repeat.operands[8] = september.prop("checked");
+          data.repeat.operands[9] = october.prop("checked");
+          data.repeat.operands[10] = november.prop("checked");
+          data.repeat.operands[11] = december.prop("checked");
         }
 
         data.output.type = outType.typedInput("type");
@@ -496,41 +1045,29 @@ SOFTWARE.
           if (multiPort) {
             data.port = node.outputs++;
 
-            if (data.trigger.type == "global" || data.trigger.type == "flow") {
-              let ctx = RED.utils.parseContextKey(data.trigger.value);
+            if (
+              data.trigger.timeType == "global" ||
+              data.trigger.timeType == "flow"
+            ) {
+              let ctx = RED.utils.parseContextKey(data.trigger.timeValue);
               data.label =
-                data.trigger.type +
+                data.trigger.timeType +
                 "." +
                 ctx.key +
                 (ctx.store ? " (" + ctx.store + ")" : "");
             } else {
               if (
-                data.trigger.type == "time" ||
-                data.trigger.type == "custom"
+                data.trigger.timeType == "time" ||
+                data.trigger.timeType == "custom"
               ) {
-                data.label = data.trigger.value;
+                data.label = data.trigger.timeValue;
               } else {
                 data.label = node._(
-                  "node-red-contrib-chronos/chronos-config:common.list." +
-                    data.trigger.type +
+                  "maya-red-scheduler/time-config:common.list." +
+                    data.trigger.timeType +
                     "." +
-                    data.trigger.value
+                    data.trigger.timeValue
                 );
-              }
-
-              if (data.trigger.offset != 0) {
-                data.label += data.trigger.offset > 0 ? " + " : " - ";
-
-                if (data.trigger.random) {
-                  data.label += "~";
-                }
-
-                data.label +=
-                  Math.abs(data.trigger.offset) +
-                  " " +
-                  node._(
-                    "node-red-contrib-chronos/chronos-config:common.label.min"
-                  );
               }
             }
           } else {
@@ -538,8 +1075,11 @@ SOFTWARE.
           }
         }
 
+        console.log("on save:", data);
+
         node.schedule.push(data);
       });
+      console.log("on save all:", node.schedule);
     },
     oneditresize: function (size) {
       let height = size.height;

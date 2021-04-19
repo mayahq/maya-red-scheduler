@@ -23,7 +23,7 @@
  */
 
 module.exports = function (RED) {
-  function ChronosChangeNode(settings) {
+  function TimeChangeNode(settings) {
     let node = this;
     RED.nodes.createNode(this, settings);
 
@@ -35,11 +35,9 @@ module.exports = function (RED) {
       node.status({
         fill: "red",
         shape: "dot",
-        text: "node-red-contrib-chronos/chronos-config:common.status.noConfig",
+        text: "maya-red-scheduler/time-config:common.status.noConfig",
       });
-      node.error(
-        RED._("node-red-contrib-chronos/chronos-config:common.error.noConfig")
-      );
+      node.error(RED._("maya-red-scheduler/time-config:common.error.noConfig"));
     } else if (settings.rules.length == 0) {
       node.status({ fill: "red", shape: "dot", text: "change.status.noRules" });
       node.error(RED._("change.error.noRules"));
@@ -87,13 +85,10 @@ module.exports = function (RED) {
         node.status({
           fill: "red",
           shape: "dot",
-          text:
-            "node-red-contrib-chronos/chronos-config:common.status.invalidConfig",
+          text: "maya-red-scheduler/time-config:common.status.invalidConfig",
         });
         node.error(
-          RED._(
-            "node-red-contrib-chronos/chronos-config:common.error.invalidConfig"
-          )
+          RED._("maya-red-scheduler/time-config:common.error.invalidConfig")
         );
       } else {
         node.on("input", (msg, send, done) => {
@@ -315,5 +310,5 @@ module.exports = function (RED) {
     }
   }
 
-  RED.nodes.registerType("chronos-change", ChronosChangeNode);
+  RED.nodes.registerType("time-change", TimeChangeNode);
 };

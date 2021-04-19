@@ -22,212 +22,203 @@
  * SOFTWARE.
  */
 
-module.exports = function(RED)
-{
-    function ChronosSwitchNode(settings)
-    {
-        const sfUtils = require("./common/sfutils.js");
+module.exports = function (RED) {
+  function TimeSwitchNode(settings) {
+    const sfUtils = require("./common/sfutils.js");
 
-        let node = this;
-        RED.nodes.createNode(this, settings);
+    let node = this;
+    RED.nodes.createNode(this, settings);
 
-        node.chronos = require("./common/chronos.js");
-        node.config = RED.nodes.getNode(settings.config);
-        node.locale = require("os-locale").sync();
+    node.chronos = require("./common/chronos.js");
+    node.config = RED.nodes.getNode(settings.config);
+    node.locale = require("os-locale").sync();
 
-        if (!node.config)
-        {
-            node.status({fill: "red", shape: "dot", text: "node-red-contrib-chronos/chronos-config:common.status.noConfig"});
-            node.error(RED._("node-red-contrib-chronos/chronos-config:common.error.noConfig"));
-        }
-        else if (settings.conditions.length == 0)
-        {
-            node.status({fill: "red", shape: "dot", text: "node-red-contrib-chronos/chronos-config:common.status.noConditions"});
-            node.error(RED._("node-red-contrib-chronos/chronos-config:common.error.noConditions"));
-        }
-        else
-        {
-            node.debug("Starting node with configuration '" + node.config.name + "' (latitude " + node.config.latitude + ", longitude " + node.config.longitude + ")");
-            node.status({});
+    if (!node.config) {
+      node.status({
+        fill: "red",
+        shape: "dot",
+        text: "maya-red-scheduler/time-config:common.status.noConfig",
+      });
+      node.error(RED._("maya-red-scheduler/time-config:common.error.noConfig"));
+    } else if (settings.conditions.length == 0) {
+      node.status({
+        fill: "red",
+        shape: "dot",
+        text: "maya-red-scheduler/time-config:common.status.noConditions",
+      });
+      node.error(
+        RED._("maya-red-scheduler/time-config:common.error.noConditions")
+      );
+    } else {
+      node.debug(
+        "Starting node with configuration '" +
+          node.config.name +
+          "' (latitude " +
+          node.config.latitude +
+          ", longitude " +
+          node.config.longitude +
+          ")"
+      );
+      node.status({});
 
-            node.baseTime = settings.baseTime;
-            node.baseTimeType = settings.baseTimeType;
-            node.conditions = settings.conditions;
-            node.stopOnFirstMatch = settings.stopOnFirstMatch;
+      node.baseTime = settings.baseTime;
+      node.baseTimeType = settings.baseTimeType;
+      node.conditions = settings.conditions;
+      node.stopOnFirstMatch = settings.stopOnFirstMatch;
 
-            // backward compatibility to v1.5.0
-            if (!node.baseTimeType)
-            {
-                node.baseTimeType = "msgIngress";
+      // backward compatibility to v1.5.0
+      if (!node.baseTimeType) {
+        node.baseTimeType = "msgIngress";
+      }
+
+      let valid = true;
+      if (node.baseTimeType != "msgIngress" && !node.baseTime) {
+        valid = false;
+      } else {
+        let otherwise = false;
+        for (let i = 0; i < node.conditions.length; ++i) {
+          let cond = node.conditions[i];
+
+          if (cond.operator == "otherwise") {
+            // only one otherwise condition is allowed
+            if (otherwise) {
+              valid = false;
+              break;
             }
 
-            let valid = true;
-            if ((node.baseTimeType != "msgIngress") && !node.baseTime)
-            {
-                valid = false;
+            otherwise = true;
+          } else if (!sfUtils.validateCondition(node, cond)) {
+            valid = false;
+            break;
+          }
+        }
+
+        // otherwise condition must not be the only one
+        if (node.conditions.length == 1 && otherwise) {
+          valid = false;
+        }
+      }
+
+      if (!valid) {
+        node.status({
+          fill: "red",
+          shape: "dot",
+          text: "maya-red-scheduler/time-config:common.status.invalidConfig",
+        });
+        node.error(
+          RED._("maya-red-scheduler/time-config:common.error.invalidConfig")
+        );
+      } else {
+        node.on("input", (msg, send, done) => {
+          if (msg) {
+            if (!send) {
+              // Node-RED 0.x backward compatibility
+              send = () => {
+                node.send.apply(node, arguments);
+              };
             }
-            else
-            {
-                let otherwise = false;
-                for (let i=0; i<node.conditions.length; ++i)
-                {
-                    let cond = node.conditions[i];
 
-                    if (cond.operator == "otherwise")
-                    {
-                        // only one otherwise condition is allowed
-                        if (otherwise)
-                        {
-                            valid = false;
-                            break;
-                        }
-
-                        otherwise = true;
-                    }
-                    else if (!sfUtils.validateCondition(node, cond))
-                    {
-                        valid = false;
-                        break;
-                    }
+            if (!done) {
+              // Node-RED 0.x backward compatibility
+              done = () => {
+                var args = [...arguments];
+                if (args.length > 0) {
+                  args.push(msg);
+                  node.error.apply(node, args);
                 }
-
-                // otherwise condition must not be the only one
-                if ((node.conditions.length == 1) && otherwise)
-                {
-                    valid = false;
-                }
+              };
             }
 
-            if (!valid)
-            {
-                node.status({fill: "red", shape: "dot", text: "node-red-contrib-chronos/chronos-config:common.status.invalidConfig"});
-                node.error(RED._("node-red-contrib-chronos/chronos-config:common.error.invalidConfig"));
-            }
-            else
-            {
-                node.on("input", (msg, send, done) =>
-                {
-                    if (msg)
-                    {
-                        if (!send)  // Node-RED 0.x backward compatibility
-                        {
-                            send = () =>
-                            {
-                                node.send.apply(node, arguments);
-                            };
-                        }
+            let baseTime = sfUtils.getBaseTime(RED, node, msg);
+            if (baseTime) {
+              node.debug(
+                "Base time: " + baseTime.format("YYYY-MM-DD HH:mm:ss")
+              );
 
-                        if (!done)  // Node-RED 0.x backward compatibility
-                        {
-                            done = () =>
-                            {
-                                var args = [...arguments];
-                                if (args.length > 0)
-                                {
-                                    args.push(msg);
-                                    node.error.apply(node, args);
-                                }
-                            };
-                        }
+              let ports = [];
 
-                        let baseTime = sfUtils.getBaseTime(RED, node, msg);
-                        if (baseTime)
-                        {
-                            node.debug("Base time: " + baseTime.format("YYYY-MM-DD HH:mm:ss"));
+              for (let i = 0; i < node.conditions.length; ++i) {
+                ports.push(null);
+              }
 
-                            let ports = [];
+              let numMatches = 0;
+              let otherwiseIndex = -1;
+              for (let i = 0; i < node.conditions.length; ++i) {
+                try {
+                  let cond = node.conditions[i];
 
-                            for (let i=0; i<node.conditions.length; ++i)
-                            {
-                                ports.push(null);
-                            }
+                  if (cond.operator == "otherwise") {
+                    node.debug("[Condition:" + (i + 1) + "] Otherwise");
+                    otherwiseIndex = i;
+                  } else if (
+                    sfUtils.evaluateCondition(RED, node, baseTime, cond, i + 1)
+                  ) {
+                    ports[i] = true;
+                    numMatches++;
+                  }
 
-                            let numMatches = 0;
-                            let otherwiseIndex = -1;
-                            for (let i=0; i<node.conditions.length; ++i)
-                            {
-                                try
-                                {
-                                    let cond = node.conditions[i];
+                  if (ports[i] && node.stopOnFirstMatch) {
+                    break;
+                  }
+                } catch (e) {
+                  if (e instanceof node.chronos.TimeError) {
+                    let errMsg = RED.util.cloneMessage(msg);
 
-                                    if (cond.operator == "otherwise")
-                                    {
-                                        node.debug("[Condition:" + (i+1) + "] Otherwise");
-                                        otherwiseIndex = i;
-                                    }
-                                    else if (sfUtils.evaluateCondition(RED, node, baseTime, cond, i+1))
-                                    {
-                                        ports[i] = true;
-                                        numMatches++;
-                                    }
-
-                                    if (ports[i] && node.stopOnFirstMatch)
-                                    {
-                                        break;
-                                    }
-                                }
-                                catch (e)
-                                {
-                                    if (e instanceof node.chronos.TimeError)
-                                    {
-                                        let errMsg = RED.util.cloneMessage(msg);
-
-                                        if (e.details)
-                                        {
-                                            if ("errorDetails" in errMsg)
-                                            {
-                                                errMsg._errorDetails = errMsg.errorDetails;
-                                            }
-                                            errMsg.errorDetails = e.details;
-                                        }
-
-                                        node.error(e.message, errMsg);
-                                    }
-                                    else
-                                    {
-                                        node.error(e.message);
-                                        node.debug(e.stack);
-                                    }
-                                }
-                            }
-
-                            if ((numMatches == 0) && (otherwiseIndex >= 0))
-                            {
-                                ports[otherwiseIndex] = msg;
-                            }
-                            else if (numMatches > 0)
-                            {
-                                let firstPort = true;
-                                for (let i=0; i<node.conditions.length; ++i)
-                                {
-                                    if (ports[i])
-                                    {
-                                        ports[i] = firstPort ? msg : RED.util.cloneMessage(msg);
-                                        firstPort = false;
-                                    }
-                                }
-                            }
-
-                            node.send(ports);
-                        }
-                        else
-                        {
-                            let variable = node.baseTime;
-                            if ((node.baseTimeType == "global") || (node.baseTimeType == "flow"))
-                            {
-                                let ctx = RED.util.parseContextStore(node.baseTime);
-                                variable = ctx.key + (ctx.store ? " (" + ctx.store + ")" : "");
-                            }
-
-                            node.error(RED._("node-red-contrib-chronos/chronos-config:common.error.invalidBaseTime", {baseTime: node.baseTimeType + "." + variable}), msg);
-                        }
+                    if (e.details) {
+                      if ("errorDetails" in errMsg) {
+                        errMsg._errorDetails = errMsg.errorDetails;
+                      }
+                      errMsg.errorDetails = e.details;
                     }
 
-                    done();
-                });
+                    node.error(e.message, errMsg);
+                  } else {
+                    node.error(e.message);
+                    node.debug(e.stack);
+                  }
+                }
+              }
+
+              if (numMatches == 0 && otherwiseIndex >= 0) {
+                ports[otherwiseIndex] = msg;
+              } else if (numMatches > 0) {
+                let firstPort = true;
+                for (let i = 0; i < node.conditions.length; ++i) {
+                  if (ports[i]) {
+                    ports[i] = firstPort ? msg : RED.util.cloneMessage(msg);
+                    firstPort = false;
+                  }
+                }
+              }
+
+              node.send(ports);
+            } else {
+              let variable = node.baseTime;
+              if (
+                node.baseTimeType == "global" ||
+                node.baseTimeType == "flow"
+              ) {
+                let ctx = RED.util.parseContextStore(node.baseTime);
+                variable = ctx.key + (ctx.store ? " (" + ctx.store + ")" : "");
+              }
+
+              node.error(
+                RED._(
+                  "maya-red-scheduler/time-config:common.error.invalidBaseTime",
+                  {
+                    baseTime: node.baseTimeType + "." + variable,
+                  }
+                ),
+                msg
+              );
             }
-        }
+          }
+
+          done();
+        });
+      }
     }
+  }
 
-    RED.nodes.registerType("chronos-switch", ChronosSwitchNode);
+  RED.nodes.registerType("time-switch", TimeSwitchNode);
 };

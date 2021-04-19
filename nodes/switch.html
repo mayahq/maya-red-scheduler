@@ -22,22 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 
-<script type="text/x-red" data-template-name="chronos-switch">
+<script type="text/x-red" data-template-name="time-switch">
   <div class="form-row">
-      <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.name"></span></label>
-      <input type="text" id="node-input-name" data-i18n="[placeholder]node-red-contrib-chronos/chronos-config:common.label.name">
+      <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.name"></span></label>
+      <input type="text" id="node-input-name" data-i18n="[placeholder]maya-red-scheduler/time-config:common.label.name">
   </div>
   <div class="form-row">
-      <label for="node-input-config"><i class="fa fa-cog"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.config"></span></label>
-      <input type="text" id="node-input-config" data-i18n="[placeholder]node-red-contrib-chronos/chronos-config:common.label.config">
+      <label for="node-input-config"><i class="fa fa-cog"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.config"></span></label>
+      <input type="text" id="node-input-config" data-i18n="[placeholder]maya-red-scheduler/time-config:common.label.config">
   </div>
   <div class="form-row" style="padding-top: 4px;">
-      <label for="node-input-baseTime"><i class="fa fa-clock-o"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.baseTime"></span></label>
+      <label for="node-input-baseTime"><i class="fa fa-clock-o"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.baseTime"></span></label>
       <input type="text" id="node-input-baseTime" style="width: 70%;">
       <input id="node-input-baseTimeType" type="hidden">
   </div>
   <div class="form-row node-input-conditionList-row" style="padding-top: 10px">
-      <label for="node-input-conditionList"><i class="fa fa-sliders"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.conditions"></span></label>
+      <label for="node-input-conditionList"><i class="fa fa-sliders"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.conditions"></span></label>
       <div class="form-row">
           <ol id="node-input-conditionList"></ol>
       </div>
@@ -49,8 +49,8 @@ SOFTWARE.
 </script>
 
 <script type="text/javascript">
-  RED.nodes.registerType("chronos-switch", {
-    category: "chronos",
+  RED.nodes.registerType("time-switch", {
+    category: "scheduling",
     color: "#DEB887",
     icon: "chronos_switch.svg",
     inputs: 1,
@@ -63,9 +63,7 @@ SOFTWARE.
       return this.name ? "node_label_italic" : "";
     },
     inputLabels: function () {
-      return this._(
-        "node-red-contrib-chronos/chronos-config:common.label.inputPort"
-      );
+      return this._("maya-red-scheduler/time-config:common.label.inputPort");
     },
     outputLabels: function (index) {
       return this.conditions[index].label;
@@ -76,7 +74,7 @@ SOFTWARE.
       },
       config: {
         value: "",
-        type: "chronos-config",
+        type: "time-config",
         required: true,
       },
       baseTime: {
@@ -111,9 +109,7 @@ SOFTWARE.
 
       const msgIngressInput = {
         value: "msgIngress",
-        label: node._(
-          "node-red-contrib-chronos/chronos-config:common.label.msgIngress"
-        ),
+        label: node._("maya-red-scheduler/time-config:common.label.msgIngress"),
         hasValue: false,
       };
 
@@ -133,85 +129,85 @@ SOFTWARE.
               {
                 value: "sunrise",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.sunrise"
+                  "maya-red-scheduler/time-config:common.list.sun.sunrise"
                 ),
               },
               {
                 value: "sunriseEnd",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.sunriseEnd"
+                  "maya-red-scheduler/time-config:common.list.sun.sunriseEnd"
                 ),
               },
               {
                 value: "sunsetStart",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.sunsetStart"
+                  "maya-red-scheduler/time-config:common.list.sun.sunsetStart"
                 ),
               },
               {
                 value: "sunset",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.sunset"
+                  "maya-red-scheduler/time-config:common.list.sun.sunset"
                 ),
               },
               {
                 value: "goldenHour",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.goldenHour"
+                  "maya-red-scheduler/time-config:common.list.sun.goldenHour"
                 ),
               },
               {
                 value: "goldenHourEnd",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.goldenHourEnd"
+                  "maya-red-scheduler/time-config:common.list.sun.goldenHourEnd"
                 ),
               },
               {
                 value: "night",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.night"
+                  "maya-red-scheduler/time-config:common.list.sun.night"
                 ),
               },
               {
                 value: "nightEnd",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.nightEnd"
+                  "maya-red-scheduler/time-config:common.list.sun.nightEnd"
                 ),
               },
               {
                 value: "dawn",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.dawn"
+                  "maya-red-scheduler/time-config:common.list.sun.dawn"
                 ),
               },
               {
                 value: "nauticalDawn",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.nauticalDawn"
+                  "maya-red-scheduler/time-config:common.list.sun.nauticalDawn"
                 ),
               },
               {
                 value: "dusk",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.dusk"
+                  "maya-red-scheduler/time-config:common.list.sun.dusk"
                 ),
               },
               {
                 value: "nauticalDusk",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.nauticalDusk"
+                  "maya-red-scheduler/time-config:common.list.sun.nauticalDusk"
                 ),
               },
               {
                 value: "solarNoon",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.solarNoon"
+                  "maya-red-scheduler/time-config:common.list.sun.solarNoon"
                 ),
               },
               {
                 value: "nadir",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.sun.nadir"
+                  "maya-red-scheduler/time-config:common.list.sun.nadir"
                 ),
               },
             ];
@@ -220,22 +216,20 @@ SOFTWARE.
               {
                 value: "rise",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.moon.rise"
+                  "maya-red-scheduler/time-config:common.list.moon.rise"
                 ),
               },
               {
                 value: "set",
                 label: node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.moon.set"
+                  "maya-red-scheduler/time-config:common.list.moon.set"
                 ),
               },
             ];
 
             const timeInput = {
               value: "time",
-              label: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.time"
-              ),
+              label: node._("maya-red-scheduler/time-config:common.label.time"),
               icon: "fa fa-clock-o",
               hasValue: true,
               validate: /^(\d|0\d|1\d|2[0-3]):([0-5]\d)(:([0-5]\d))?\s*(am|AM|pm|PM)?$/,
@@ -243,18 +237,14 @@ SOFTWARE.
 
             const sunTimeInput = {
               value: "sun",
-              label: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.sun"
-              ),
+              label: node._("maya-red-scheduler/time-config:common.label.sun"),
               icon: "fa fa-sun-o",
               options: sunTimes,
             };
 
             const moonTimeInput = {
               value: "moon",
-              label: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.moon"
-              ),
+              label: node._("maya-red-scheduler/time-config:common.label.moon"),
               icon: "fa fa-moon-o",
               options: moonTimes,
             };
@@ -262,7 +252,7 @@ SOFTWARE.
             const customInput = {
               value: "custom",
               label: node._(
-                "node-red-contrib-chronos/chronos-config:common.label.custom"
+                "maya-red-scheduler/time-config:common.label.custom"
               ),
               icon: "fa fa-wrench",
               hasValue: true,
@@ -322,7 +312,7 @@ SOFTWARE.
               .attr(
                 "label",
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.condition.operators"
+                  "maya-red-scheduler/time-config:common.list.condition.operators"
                 )
               )
               .append(
@@ -330,7 +320,7 @@ SOFTWARE.
                   .val("before")
                   .text(
                     node._(
-                      "node-red-contrib-chronos/chronos-config:common.list.condition.operator.before"
+                      "maya-red-scheduler/time-config:common.list.condition.operator.before"
                     )
                   )
               )
@@ -339,7 +329,7 @@ SOFTWARE.
                   .val("after")
                   .text(
                     node._(
-                      "node-red-contrib-chronos/chronos-config:common.list.condition.operator.after"
+                      "maya-red-scheduler/time-config:common.list.condition.operator.after"
                     )
                   )
               )
@@ -348,7 +338,7 @@ SOFTWARE.
                   .val("between")
                   .text(
                     node._(
-                      "node-red-contrib-chronos/chronos-config:common.list.condition.operator.between"
+                      "maya-red-scheduler/time-config:common.list.condition.operator.between"
                     )
                   )
               )
@@ -357,7 +347,7 @@ SOFTWARE.
                   .val("outside")
                   .text(
                     node._(
-                      "node-red-contrib-chronos/chronos-config:common.list.condition.operator.outside"
+                      "maya-red-scheduler/time-config:common.list.condition.operator.outside"
                     )
                   )
               )
@@ -366,7 +356,7 @@ SOFTWARE.
                   .val("weekdays")
                   .text(
                     node._(
-                      "node-red-contrib-chronos/chronos-config:common.list.condition.operator.weekdays"
+                      "maya-red-scheduler/time-config:common.list.condition.operator.weekdays"
                     )
                   )
               )
@@ -375,7 +365,7 @@ SOFTWARE.
                   .val("months")
                   .text(
                     node._(
-                      "node-red-contrib-chronos/chronos-config:common.list.condition.operator.months"
+                      "maya-red-scheduler/time-config:common.list.condition.operator.months"
                     )
                   )
               )
@@ -384,7 +374,7 @@ SOFTWARE.
                   .val("otherwise")
                   .text(
                     node._(
-                      "node-red-contrib-chronos/chronos-config:common.list.condition.operator.otherwise"
+                      "maya-red-scheduler/time-config:common.list.condition.operator.otherwise"
                     )
                   )
               )
@@ -393,7 +383,7 @@ SOFTWARE.
               .attr(
                 "label",
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.condition.sources"
+                  "maya-red-scheduler/time-config:common.list.condition.sources"
                 )
               )
               .append(
@@ -401,7 +391,7 @@ SOFTWARE.
                   .val("context")
                   .text(
                     node._(
-                      "node-red-contrib-chronos/chronos-config:common.list.condition.source.context"
+                      "maya-red-scheduler/time-config:common.list.condition.source.context"
                     )
                   )
               )
@@ -463,9 +453,7 @@ SOFTWARE.
 
             $("<label/>", { style: "width: auto; margin-right: 6px;" })
               .text(
-                node._(
-                  "node-red-contrib-chronos/chronos-config:common.label.offset"
-                )
+                node._("maya-red-scheduler/time-config:common.label.offset")
               )
               .appendTo(time1Row2);
             let offset1 = $("<input/>", {
@@ -484,17 +472,13 @@ SOFTWARE.
               style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
             })
               .text(
-                node._(
-                  "node-red-contrib-chronos/chronos-config:common.label.random"
-                )
+                node._("maya-red-scheduler/time-config:common.label.random")
               )
               .appendTo(time1Row2);
 
             $("<label/>", { style: "width: auto; margin-right: 6px;" })
               .text(
-                node._(
-                  "node-red-contrib-chronos/chronos-config:common.label.offset"
-                )
+                node._("maya-red-scheduler/time-config:common.label.offset")
               )
               .appendTo(time2Row2);
             let offset2 = $("<input/>", {
@@ -513,9 +497,7 @@ SOFTWARE.
               style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
             })
               .text(
-                node._(
-                  "node-red-contrib-chronos/chronos-config:common.label.random"
-                )
+                node._("maya-red-scheduler/time-config:common.label.random")
               )
               .appendTo(time2Row2);
 
@@ -530,7 +512,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.weekday.monday"
+                  "maya-red-scheduler/time-config:common.list.weekday.monday"
                 )
               )
               .appendTo(weekdaysBox);
@@ -545,7 +527,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.weekday.tuesday"
+                  "maya-red-scheduler/time-config:common.list.weekday.tuesday"
                 )
               )
               .appendTo(weekdaysBox);
@@ -560,7 +542,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.weekday.wednesday"
+                  "maya-red-scheduler/time-config:common.list.weekday.wednesday"
                 )
               )
               .appendTo(weekdaysBox);
@@ -575,7 +557,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.weekday.thursday"
+                  "maya-red-scheduler/time-config:common.list.weekday.thursday"
                 )
               )
               .appendTo(weekdaysBox);
@@ -590,7 +572,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.weekday.friday"
+                  "maya-red-scheduler/time-config:common.list.weekday.friday"
                 )
               )
               .appendTo(weekdaysBox);
@@ -605,7 +587,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.weekday.saturday"
+                  "maya-red-scheduler/time-config:common.list.weekday.saturday"
                 )
               )
               .appendTo(weekdaysBox);
@@ -620,7 +602,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.weekday.sunday"
+                  "maya-red-scheduler/time-config:common.list.weekday.sunday"
                 )
               )
               .appendTo(weekdaysBox);
@@ -636,7 +618,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.january"
+                  "maya-red-scheduler/time-config:common.list.month.january"
                 )
               )
               .appendTo(monthsRow1);
@@ -651,7 +633,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.february"
+                  "maya-red-scheduler/time-config:common.list.month.february"
                 )
               )
               .appendTo(monthsRow1);
@@ -665,9 +647,7 @@ SOFTWARE.
               style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
             })
               .text(
-                node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.march"
-                )
+                node._("maya-red-scheduler/time-config:common.list.month.march")
               )
               .appendTo(monthsRow1);
             let april = $("<input/>", {
@@ -680,9 +660,7 @@ SOFTWARE.
               style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
             })
               .text(
-                node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.april"
-                )
+                node._("maya-red-scheduler/time-config:common.list.month.april")
               )
               .appendTo(monthsRow1);
             let may = $("<input/>", {
@@ -695,9 +673,7 @@ SOFTWARE.
               style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
             })
               .text(
-                node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.may"
-                )
+                node._("maya-red-scheduler/time-config:common.list.month.may")
               )
               .appendTo(monthsRow2);
             let june = $("<input/>", {
@@ -710,9 +686,7 @@ SOFTWARE.
               style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
             })
               .text(
-                node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.june"
-                )
+                node._("maya-red-scheduler/time-config:common.list.month.june")
               )
               .appendTo(monthsRow2);
             let july = $("<input/>", {
@@ -725,9 +699,7 @@ SOFTWARE.
               style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
             })
               .text(
-                node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.july"
-                )
+                node._("maya-red-scheduler/time-config:common.list.month.july")
               )
               .appendTo(monthsRow2);
             let august = $("<input/>", {
@@ -741,7 +713,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.august"
+                  "maya-red-scheduler/time-config:common.list.month.august"
                 )
               )
               .appendTo(monthsRow2);
@@ -756,7 +728,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.september"
+                  "maya-red-scheduler/time-config:common.list.month.september"
                 )
               )
               .appendTo(monthsRow3);
@@ -771,7 +743,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.october"
+                  "maya-red-scheduler/time-config:common.list.month.october"
                 )
               )
               .appendTo(monthsRow3);
@@ -786,7 +758,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.november"
+                  "maya-red-scheduler/time-config:common.list.month.november"
                 )
               )
               .appendTo(monthsRow3);
@@ -801,7 +773,7 @@ SOFTWARE.
             })
               .text(
                 node._(
-                  "node-red-contrib-chronos/chronos-config:common.list.month.december"
+                  "maya-red-scheduler/time-config:common.list.month.december"
                 )
               )
               .appendTo(monthsRow3);
@@ -1028,64 +1000,28 @@ SOFTWARE.
       let node = this;
 
       const WEEKDAYS = [
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.weekday.sunday"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.weekday.monday"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.weekday.tuesday"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.weekday.wednesday"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.weekday.thursday"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.weekday.friday"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.weekday.saturday"
-        ),
+        node._("maya-red-scheduler/time-config:common.list.weekday.sunday"),
+        node._("maya-red-scheduler/time-config:common.list.weekday.monday"),
+        node._("maya-red-scheduler/time-config:common.list.weekday.tuesday"),
+        node._("maya-red-scheduler/time-config:common.list.weekday.wednesday"),
+        node._("maya-red-scheduler/time-config:common.list.weekday.thursday"),
+        node._("maya-red-scheduler/time-config:common.list.weekday.friday"),
+        node._("maya-red-scheduler/time-config:common.list.weekday.saturday"),
       ];
 
       const MONTHS = [
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.january"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.february"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.march"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.april"
-        ),
-        node._("node-red-contrib-chronos/chronos-config:common.list.month.may"),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.june"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.july"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.august"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.september"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.october"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.november"
-        ),
-        node._(
-          "node-red-contrib-chronos/chronos-config:common.list.month.december"
-        ),
+        node._("maya-red-scheduler/time-config:common.list.month.january"),
+        node._("maya-red-scheduler/time-config:common.list.month.february"),
+        node._("maya-red-scheduler/time-config:common.list.month.march"),
+        node._("maya-red-scheduler/time-config:common.list.month.april"),
+        node._("maya-red-scheduler/time-config:common.list.month.may"),
+        node._("maya-red-scheduler/time-config:common.list.month.june"),
+        node._("maya-red-scheduler/time-config:common.list.month.july"),
+        node._("maya-red-scheduler/time-config:common.list.month.august"),
+        node._("maya-red-scheduler/time-config:common.list.month.september"),
+        node._("maya-red-scheduler/time-config:common.list.month.october"),
+        node._("maya-red-scheduler/time-config:common.list.month.november"),
+        node._("maya-red-scheduler/time-config:common.list.month.december"),
       ];
 
       let conditionList = $("#node-input-conditionList").editableList("items");
@@ -1125,7 +1061,7 @@ SOFTWARE.
 
         data.operator = operator.val();
         data.label = node._(
-          "node-red-contrib-chronos/chronos-config:common.list.condition.operator." +
+          "maya-red-scheduler/time-config:common.list.condition.operator." +
             data.operator
         );
 
@@ -1142,7 +1078,7 @@ SOFTWARE.
             data.label +=
               " " +
               node._(
-                "node-red-contrib-chronos/chronos-config:common.list." +
+                "maya-red-scheduler/time-config:common.list." +
                   data.operands.type +
                   "." +
                   data.operands.value
@@ -1167,7 +1103,7 @@ SOFTWARE.
             data.label += data.operands[0].value;
           } else {
             data.label += node._(
-              "node-red-contrib-chronos/chronos-config:common.list." +
+              "maya-red-scheduler/time-config:common.list." +
                 data.operands[0].type +
                 "." +
                 data.operands[0].value
@@ -1181,7 +1117,7 @@ SOFTWARE.
             data.label += data.operands[1].value;
           } else {
             data.label += node._(
-              "node-red-contrib-chronos/chronos-config:common.list." +
+              "maya-red-scheduler/time-config:common.list." +
                 data.operands[1].type +
                 "." +
                 data.operands[1].value
