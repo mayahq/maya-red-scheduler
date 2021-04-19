@@ -1,4 +1,4 @@
-# maya-red-chronos
+# maya-red-scheduler
 
 <a href="https://www.npmjs.com/package/node-red-contrib-chronos"><img title="npm version" src="https://badgen.net/npm/v/node-red-contrib-chronos"></a>
 <a href="https://www.npmjs.com/package/node-red-contrib-chronos"><img title="npm downloads" src="https://badgen.net/npm/dt/node-red-contrib-chronos"></a>
