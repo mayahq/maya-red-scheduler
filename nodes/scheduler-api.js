@@ -389,13 +389,13 @@ module.exports = function (RED) {
           data.config.trigger.timeValue
         );
 
-        let triggerDate = chronos.getUserDate(
-          RED,
-          node,
-          repeat ? now.clone().add(1, "days") : now.clone(),
-          data.config.trigger.dateType,
-          data.config.trigger.dateValue
-        );
+        // let triggerDate = chronos.getUserDate(
+        //   RED,
+        //   node,
+        //   repeat ? now.clone().add(1, "days") : now.clone(),
+        //   data.config.trigger.dateType,
+        //   data.config.trigger.dateValue
+        // );
 
         if (triggerTime.isBefore(now)) {
           node.debug(

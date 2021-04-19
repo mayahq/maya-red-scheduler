@@ -904,17 +904,21 @@ SOFTWARE.
               december.prop("checked", data.repeat.operands[11]);
             }
 
-            repeater.change();
-
             triggerTime.typedInput("value", data.trigger.timeValue);
             triggerTime._prevType = data.trigger.timeType;
             triggerTime.typedInput("type", data.trigger.timeType);
+            console.log(
+              "After setting time: ",
+              triggerTime.typedInput("value"),
+              triggerTime.typedInput("type")
+            );
 
-            triggerDate.typedInput("value", data.trigger.dateValue);
             triggerDate._prevType = data.trigger.dateType;
             triggerDate.typedInput("type", data.trigger.dateType);
 
-            console.log("on prepare:", data);
+            if (data.trigger.dateType == "date") {
+              triggerDate.typedInput("value", data.trigger.dateValue);
+            }
 
             if (data.output.type == "fullMsg") {
               msgValue.typedInput("value", data.output.value);
@@ -925,12 +929,13 @@ SOFTWARE.
             }
             outType._prevType = data.output.type;
             outType.typedInput("type", data.output.type);
-
+            repeater.change();
             item[0].appendChild(fragment);
           },
         });
 
       node.schedule.forEach((data) => {
+        console.log("on prepare item:", data);
         scheduleList.editableList("addItem", data);
       });
     },
@@ -1007,6 +1012,7 @@ SOFTWARE.
 
         node.schedule.push(data);
       });
+      console.log("on save all:", node.schedule);
     },
     oneditresize: function (size) {
       let height = size.height;
