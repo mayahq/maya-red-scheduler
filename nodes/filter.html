@@ -22,742 +22,1071 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 
-<script type="text/x-red" data-template-name="chronos-filter">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.name"></span></label>
-        <input type="text" id="node-input-name" data-i18n="[placeholder]node-red-contrib-chronos/chronos-config:common.label.name">
-    </div>
-    <div class="form-row">
-        <label for="node-input-config"><i class="fa fa-cog"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.config"></span></label>
-        <input type="text" id="node-input-config" data-i18n="[placeholder]node-red-contrib-chronos/chronos-config:common.label.config">
-    </div>
-    <div class="form-row" style="padding-top: 4px;">
-        <label for="node-input-baseTime"><i class="fa fa-clock-o"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.baseTime"></span></label>
-        <input type="text" id="node-input-baseTime" style="width: 70%;">
-        <input id="node-input-baseTimeType" type="hidden">
-    </div>
-    <div class="form-row node-input-conditionList-row" style="padding-top: 10px">
-        <label for="node-input-conditionList"><i class="fa fa-sliders"></i> <span data-i18n="node-red-contrib-chronos/chronos-config:common.label.conditions"></span></label>
-        <div class="form-row">
-            <ol id="node-input-conditionList"></ol>
-        </div>
-    </div>
-    <div class="form-row">
-        <input id="node-input-allMustMatch" type="checkbox" style="margin-top: 0px; margin-bottom: 1px; width: auto;">
-        <label for="node-input-allMustMatch" style="margin-bottom: 0px; width: auto;" data-i18n="filter.label.allMustMatch"></label>
-    </div>
-    <div class="form-row">
-        <input id="node-input-annotateOnly" type="checkbox" style="margin-top: 0px; margin-bottom: 1px; width: auto;">
-        <label for="node-input-annotateOnly" style="margin-bottom: 0px; width: auto;" data-i18n="filter.label.annotateOnly"></label>
-    </div>
+<script type="text/x-red" data-template-name="time-filter">
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.name"></span></label>
+      <input type="text" id="node-input-name" data-i18n="[placeholder]maya-red-scheduler/time-config:common.label.name">
+  </div>
+  <div class="form-row">
+      <label for="node-input-config"><i class="fa fa-cog"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.config"></span></label>
+      <input type="text" id="node-input-config" data-i18n="[placeholder]maya-red-scheduler/time-config:common.label.config">
+  </div>
+  <div class="form-row" style="padding-top: 4px;">
+      <label for="node-input-baseTime"><i class="fa fa-clock-o"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.baseTime"></span></label>
+      <input type="text" id="node-input-baseTime" style="width: 70%;">
+      <input id="node-input-baseTimeType" type="hidden">
+  </div>
+  <div class="form-row node-input-conditionList-row" style="padding-top: 10px">
+      <label for="node-input-conditionList"><i class="fa fa-sliders"></i> <span data-i18n="maya-red-scheduler/time-config:common.label.conditions"></span></label>
+      <div class="form-row">
+          <ol id="node-input-conditionList"></ol>
+      </div>
+  </div>
+  <div class="form-row">
+      <input id="node-input-allMustMatch" type="checkbox" style="margin-top: 0px; margin-bottom: 1px; width: auto;">
+      <label for="node-input-allMustMatch" style="margin-bottom: 0px; width: auto;" data-i18n="filter.label.allMustMatch"></label>
+  </div>
+  <div class="form-row">
+      <input id="node-input-annotateOnly" type="checkbox" style="margin-top: 0px; margin-bottom: 1px; width: auto;">
+      <label for="node-input-annotateOnly" style="margin-bottom: 0px; width: auto;" data-i18n="filter.label.annotateOnly"></label>
+  </div>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType("chronos-filter",
-    {
-        category:     "chronos",
-        color:        "#DEB887",
-        icon:         "chronos_filter.svg",
-        inputs:       1,
-        outputs:      1,
-        paletteLabel: "time filter",
-        label: function()
-        {
-            return (this.name || this._("filter.label.node"));
+  RED.nodes.registerType("time-filter", {
+    category: "scheduling",
+    color: "#DEB887",
+    icon: "chronos_filter.svg",
+    inputs: 1,
+    outputs: 1,
+    paletteLabel: "time filter",
+    label: function () {
+      return this.name || this._("filter.label.node");
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_italic" : "";
+    },
+    inputLabels: function () {
+      return this._("maya-red-scheduler/time-config:common.label.inputPort");
+    },
+    outputLabels: function (index) {
+      return this._("filter.label.outputPort");
+    },
+    defaults: {
+      name: {
+        value: "",
+      },
+      config: {
+        value: "",
+        type: "time-config",
+        required: true,
+      },
+      baseTime: {
+        value: "",
+        validate: RED.validators.typedInput("baseTimeType"),
+      },
+      baseTimeType: {
+        value: "msgIngress",
+      },
+      conditions: {
+        value: [{ operator: "before", operands: { type: "time", value: "" } }],
+        validate: function (v) {
+          // just a simple check if there are any conditions, no detailed check of the content
+          return v.length > 0;
         },
-        labelStyle: function()
-        {
-            return (this.name ? "node_label_italic" : "");
-        },
-        inputLabels: function()
-        {
-            return this._("node-red-contrib-chronos/chronos-config:common.label.inputPort");
-        },
-        outputLabels: function(index)
-        {
-            return this._("filter.label.outputPort");
-        },
-        defaults:
-        {
-            name:
-            {
-                value: ""
-            },
-            config:
-            {
-                value:    "",
-                type:     "chronos-config",
-                required: true
-            },
-            baseTime:
-            {
-                value:    "",
-                validate: RED.validators.typedInput("baseTimeType")
-            },
-            baseTimeType:
-            {
-                value: "msgIngress"
-            },
-            conditions:
-            {
-                value: [{operator: "before", operands: {type: "time", value: ""}}],
-                validate: function(v)
-                {
-                    // just a simple check if there are any conditions, no detailed check of the content
-                    return v.length > 0;
-                }
-            },
-            allMustMatch:
-            {
-                value: false
-            },
-            annotateOnly:
-            {
-                value: false
-            }
-        },
-        oneditprepare: function()
-        {
-            let node = this;
+      },
+      allMustMatch: {
+        value: false,
+      },
+      annotateOnly: {
+        value: false,
+      },
+    },
+    oneditprepare: function () {
+      let node = this;
 
-            const msgIngressInput =
-            {
-                value: "msgIngress",
-                label: node._("node-red-contrib-chronos/chronos-config:common.label.msgIngress"),
-                hasValue: false
+      const msgIngressInput = {
+        value: "msgIngress",
+        label: node._("maya-red-scheduler/time-config:common.label.msgIngress"),
+        hasValue: false,
+      };
+
+      let baseTime = $("#node-input-baseTime").typedInput({
+        types: [msgIngressInput, "global", "flow", "msg"],
+        typeField: "#node-input-baseTimeType",
+      });
+
+      let conditionList = $("#node-input-conditionList")
+        .css("min-width", "500px")
+        .css("min-height", "150px")
+        .editableList({
+          removable: true,
+          sortable: true,
+          addItem: function (item, index, data) {
+            const sunTimes = [
+              {
+                value: "sunrise",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.sunrise"
+                ),
+              },
+              {
+                value: "sunriseEnd",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.sunriseEnd"
+                ),
+              },
+              {
+                value: "sunsetStart",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.sunsetStart"
+                ),
+              },
+              {
+                value: "sunset",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.sunset"
+                ),
+              },
+              {
+                value: "goldenHour",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.goldenHour"
+                ),
+              },
+              {
+                value: "goldenHourEnd",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.goldenHourEnd"
+                ),
+              },
+              {
+                value: "night",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.night"
+                ),
+              },
+              {
+                value: "nightEnd",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.nightEnd"
+                ),
+              },
+              {
+                value: "dawn",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.dawn"
+                ),
+              },
+              {
+                value: "nauticalDawn",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.nauticalDawn"
+                ),
+              },
+              {
+                value: "dusk",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.dusk"
+                ),
+              },
+              {
+                value: "nauticalDusk",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.nauticalDusk"
+                ),
+              },
+              {
+                value: "solarNoon",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.solarNoon"
+                ),
+              },
+              {
+                value: "nadir",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.sun.nadir"
+                ),
+              },
+            ];
+
+            const moonTimes = [
+              {
+                value: "rise",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.moon.rise"
+                ),
+              },
+              {
+                value: "set",
+                label: node._(
+                  "maya-red-scheduler/time-config:common.list.moon.set"
+                ),
+              },
+            ];
+
+            const timeInput = {
+              value: "time",
+              label: node._("maya-red-scheduler/time-config:common.label.time"),
+              icon: "fa fa-clock-o",
+              hasValue: true,
+              validate: /^(\d|0\d|1\d|2[0-3]):([0-5]\d)(:([0-5]\d))?\s*(am|AM|pm|PM)?$/,
             };
 
-            let baseTime = $("#node-input-baseTime")
-                            .typedInput({types: [msgIngressInput, "global", "flow", "msg"], typeField: "#node-input-baseTimeType"});
+            const sunTimeInput = {
+              value: "sun",
+              label: node._("maya-red-scheduler/time-config:common.label.sun"),
+              icon: "fa fa-sun-o",
+              options: sunTimes,
+            };
 
-            let conditionList = $("#node-input-conditionList").css("min-width", "500px").css("min-height", "150px").editableList(
-            {
-                removable: true,
-                sortable: true,
-                addItem: function(item, index, data)
-                {
-                    const sunTimes =
-                    [
-                        {
-                            value: "sunrise",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.sunrise")
-                        },
-                        {
-                            value: "sunriseEnd",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.sunriseEnd")
-                        },
-                        {
-                            value: "sunsetStart",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.sunsetStart")
-                        },
-                        {
-                            value: "sunset",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.sunset")
-                        },
-                        {
-                            value: "goldenHour",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.goldenHour")
-                        },
-                        {
-                            value: "goldenHourEnd",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.goldenHourEnd")
-                        },
-                        {
-                            value: "night",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.night")
-                        },
-                        {
-                            value: "nightEnd",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.nightEnd")
-                        },
-                        {
-                            value: "dawn",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.dawn")
-                        },
-                        {
-                            value: "nauticalDawn",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.nauticalDawn")
-                        },
-                        {
-                            value: "dusk",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.dusk")
-                        },
-                        {
-                            value: "nauticalDusk",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.nauticalDusk")
-                        },
-                        {
-                            value: "solarNoon",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.solarNoon")
-                        },
-                        {
-                            value: "nadir",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.sun.nadir")
-                        }
-                    ];
+            const moonTimeInput = {
+              value: "moon",
+              label: node._("maya-red-scheduler/time-config:common.label.moon"),
+              icon: "fa fa-moon-o",
+              options: moonTimes,
+            };
 
-                    const moonTimes =
-                    [
-                        {
-                            value: "rise",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.moon.rise")
-                        },
-                        {
-                            value: "set",
-                            label: node._("node-red-contrib-chronos/chronos-config:common.list.moon.set")
-                        }
-                    ];
+            const customInput = {
+              value: "custom",
+              label: node._(
+                "maya-red-scheduler/time-config:common.label.custom"
+              ),
+              icon: "fa fa-wrench",
+              hasValue: true,
+              validate: /^[a-zA-Z][0-9a-zA-Z_]*$/,
+            };
 
-                    const timeInput =
-                    {
-                        value: "time",
-                        label: node._("node-red-contrib-chronos/chronos-config:common.label.time"),
-                        icon: "fa fa-clock-o",
-                        hasValue: true,
-                        validate: /^(\d|0\d|1\d|2[0-3]):([0-5]\d)(:([0-5]\d))?\s*(am|AM|pm|PM)?$/
-                    };
-
-                    const sunTimeInput =
-                    {
-                        value: "sun",
-                        label: node._("node-red-contrib-chronos/chronos-config:common.label.sun"),
-                        icon: "fa fa-sun-o",
-                        options: sunTimes
-                    };
-
-                    const moonTimeInput =
-                    {
-                        value: "moon",
-                        label: node._("node-red-contrib-chronos/chronos-config:common.label.moon"),
-                        icon: "fa fa-moon-o",
-                        options: moonTimes
-                    };
-
-                    const customInput =
-                    {
-                        value: "custom",
-                        label: node._("node-red-contrib-chronos/chronos-config:common.label.custom"),
-                        icon: "fa fa-wrench",
-                        hasValue: true,
-                        validate: /^[a-zA-Z][0-9a-zA-Z_]*$/
-                    };
-
-                    const offsetInput =
-                    {
-                        min: -300,
-                        max: 300,
-                        step: 5,
-                        change: function(event, ui)
-                        {
-                            var value = parseInt($(this).spinner("value"), 10);
-                            var min = $(this).spinner("option", "min");
-                            var max = $(this).spinner("option", "max");
-                            if (isNaN(value) ||
-                                (value < min))
-                            {
-                                $(this).spinner("value", min);
-                            }
-                            else if (value > max)
-                            {
-                                $(this).spinner("value", max);
-                            }
-                        }
-                    };
-
-                    let fragment = document.createDocumentFragment();
-                    let operatorBox = $("<div/>", {style: "display: inline-block; vertical-align: middle; width: auto;"}).appendTo(fragment);
-                    let timeBox = $("<div/>", {style: "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;"}).appendTo(fragment);
-                    let weekdaysBox = $("<div/>", {style: "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;"}).appendTo(fragment);
-                    let monthsBox = $("<div/>", {style: "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;"}).appendTo(fragment);
-                    let contextBox = $("<div/>", {style: "display: inline-block; vertical-align: middle; width: auto; margin-left: 6px;"}).appendTo(fragment);
-
-                    let operator = $("<select/>", {class: "node-input-operator", style: "width: 120px;"})
-                                        .appendTo(operatorBox);
-                    let operGrp = $("<optgroup></optgroup>").attr("label", node._("node-red-contrib-chronos/chronos-config:common.list.condition.operators"))
-                                        .append($("<option></option>").val("before").text(node._("node-red-contrib-chronos/chronos-config:common.list.condition.operator.before")))
-                                        .append($("<option></option>").val("after").text(node._("node-red-contrib-chronos/chronos-config:common.list.condition.operator.after")))
-                                        .append($("<option></option>").val("between").text(node._("node-red-contrib-chronos/chronos-config:common.list.condition.operator.between")))
-                                        .append($("<option></option>").val("outside").text(node._("node-red-contrib-chronos/chronos-config:common.list.condition.operator.outside")))
-                                        .append($("<option></option>").val("weekdays").text(node._("node-red-contrib-chronos/chronos-config:common.list.condition.operator.weekdays")))
-                                        .append($("<option></option>").val("months").text(node._("node-red-contrib-chronos/chronos-config:common.list.condition.operator.months")))
-                                        .appendTo(operator);
-                    let fromGrp = $("<optgroup></optgroup>").attr("label", node._("node-red-contrib-chronos/chronos-config:common.list.condition.sources"))
-                                        .append($("<option></option>").val("context").text(node._("node-red-contrib-chronos/chronos-config:common.list.condition.source.context")))
-                                        .appendTo(operator);
-
-                    let time1Box = $("<div/>", {style: "margin-left: 4px;"}).appendTo(timeBox);
-                    let time2Box = $("<div/>", {style: "margin-left: 4px; margin-top: 5px;"}).appendTo(timeBox);
-                    let time1Row1 = $("<div/>").appendTo(time1Box);
-                    let time1Row2 = $("<div/>", {style: "margin-top: 5px;"}).appendTo(time1Box);
-                    let time2Row1 = $("<div/>").appendTo(time2Box);
-                    let time2Row2 = $("<div/>", {style: "margin-top: 5px;"}).appendTo(time2Box);
-                    let monthsRow1 = $("<div/>").appendTo(monthsBox);
-                    let monthsRow2 = $("<div/>", {style: "margin-top: 5px;"}).appendTo(monthsBox);
-                    let monthsRow3 = $("<div/>", {style: "margin-top: 5px;"}).appendTo(monthsBox);
-
-                    let time1 = $("<input/>", {type: "text", class: "node-input-time1"})
-                                        .appendTo(time1Row1)
-                                        .typedInput({types: [timeInput, sunTimeInput, moonTimeInput, customInput]});
-                    time1.typedInput("width", "280px");
-                    time1._prevType = "time";
-                    let extend1 = $("<a/>", {href: "#", style: "margin-left: 6px;"})
-                                        .html("<i class='fa fa-angle-double-down' aria-hidden='true'></i>")
-                                        .appendTo(time1Row1);
-
-                    let time2 = $("<input/>", {type: "text", class: "node-input-time2"})
-                                        .appendTo(time2Row1)
-                                        .typedInput({types: [timeInput, sunTimeInput, moonTimeInput, customInput]});
-                    time2.typedInput("width", "280px");
-                    time2._prevType = "time";
-                    let extend2 = $("<a/>", {href: "#", style: "margin-left: 6px;"})
-                                        .html("<i class='fa fa-angle-double-down' aria-hidden='true'></i>")
-                                        .appendTo(time2Row1);
-
-                    $("<label/>", {style: "width: auto; margin-right: 6px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.label.offset"))
-                                        .appendTo(time1Row2);
-                    let offset1 = $("<input/>", {class: "node-input-offset1", style: "width: 50px;"})
-                                        .appendTo(time1Row2)
-                                        .spinner(offsetInput);
-                    let random1 = $("<input/>", {type: "checkbox", class: "node-input-random1", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(time1Row2);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: auto;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.label.random"))
-                                        .appendTo(time1Row2);
-
-                    $("<label/>", {style: "width: auto; margin-right: 6px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.label.offset"))
-                                        .appendTo(time2Row2);
-                    let offset2 = $("<input/>", {class: "node-input-offset2", style: "width: 50px;"})
-                                        .appendTo(time2Row2)
-                                        .spinner(offsetInput);
-                    let random2 = $("<input/>", {type: "checkbox", class: "node-input-random2", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(time2Row2);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: auto;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.label.random"))
-                                        .appendTo(time2Row2);
-
-                    let monday = $("<input/>", {type: "checkbox", class: "node-input-monday", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(weekdaysBox);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: auto;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.weekday.monday")).appendTo(weekdaysBox);
-                    let tuesday = $("<input/>", {type: "checkbox", class: "node-input-tuesday", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(weekdaysBox);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: auto;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.weekday.tuesday")).appendTo(weekdaysBox);
-                    let wednesday = $("<input/>", {type: "checkbox", class: "node-input-wednesday", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(weekdaysBox);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: auto;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.weekday.wednesday")).appendTo(weekdaysBox);
-                    let thursday = $("<input/>", {type: "checkbox", class: "node-input-thursday", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(weekdaysBox);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: auto;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.weekday.thursday")).appendTo(weekdaysBox);
-                    let friday = $("<input/>", {type: "checkbox", class: "node-input-friday", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(weekdaysBox);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: auto;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.weekday.friday")).appendTo(weekdaysBox);
-                    let saturday = $("<input/>", {type: "checkbox", class: "node-input-saturday", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(weekdaysBox);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: auto;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.weekday.saturday")).appendTo(weekdaysBox);
-                    let sunday = $("<input/>", {type: "checkbox", class: "node-input-sunday", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(weekdaysBox);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: auto;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.weekday.sunday")).appendTo(weekdaysBox);
-
-                    let january = $("<input/>", {type: "checkbox", class: "node-input-january", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow1);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.january")).appendTo(monthsRow1);
-                    let february = $("<input/>", {type: "checkbox", class: "node-input-february", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow1);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.february")).appendTo(monthsRow1);
-                    let march = $("<input/>", {type: "checkbox", class: "node-input-march", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow1);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.march")).appendTo(monthsRow1);
-                    let april = $("<input/>", {type: "checkbox", class: "node-input-april", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow1);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.april")).appendTo(monthsRow1);
-                    let may = $("<input/>", {type: "checkbox", class: "node-input-may", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow2);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.may")).appendTo(monthsRow2);
-                    let june = $("<input/>", {type: "checkbox", class: "node-input-june", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow2);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.june")).appendTo(monthsRow2);
-                    let july = $("<input/>", {type: "checkbox", class: "node-input-july", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow2);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.july")).appendTo(monthsRow2);
-                    let august = $("<input/>", {type: "checkbox", class: "node-input-august", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow2);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.august")).appendTo(monthsRow2);
-                    let september = $("<input/>", {type: "checkbox", class: "node-input-september", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow3);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.september")).appendTo(monthsRow3);
-                    let october = $("<input/>", {type: "checkbox", class: "node-input-october", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow3);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.october")).appendTo(monthsRow3);
-                    let november = $("<input/>", {type: "checkbox", class: "node-input-november", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow3);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.november")).appendTo(monthsRow3);
-                    let december = $("<input/>", {type: "checkbox", class: "node-input-december", style: "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;"})
-                                        .appendTo(monthsRow3);
-                    $("<label/>", {style: "margin-left: 4px; margin-bottom: 0px; width: 40px;"})
-                                        .text(node._("node-red-contrib-chronos/chronos-config:common.list.month.december")).appendTo(monthsRow3);
-
-                    let context = $("<input/>", {type: "text", class: "node-input-context"})
-                                        .appendTo(contextBox)
-                                        .typedInput({types: ["global", "flow"]});
-                    context.typedInput("width", "280px");
-
-                    operator.change(function()
-                    {
-                        timeBox.hide();
-                        time2Box.hide();
-                        weekdaysBox.hide();
-                        monthsBox.hide();
-                        contextBox.hide();
-
-                        var value = $(this).val();
-                        switch (value)
-                        {
-                            case "before":
-                            case "after":
-                            {
-                                timeBox.show();
-                                break;
-                            }
-                            case "between":
-                            case "outside":
-                            {
-                                timeBox.show();
-                                time2Box.show();
-                                break;
-                            }
-                            case "weekdays":
-                            {
-                                weekdaysBox.show();
-                                break;
-                            }
-                            case "months":
-                            {
-                                monthsBox.show();
-                                break;
-                            }
-                            case "context":
-                            {
-                                contextBox.show();
-                                break;
-                            }
-                        }
-                    });
-
-                    time1.on("change", function()
-                    {
-                        let type = time1.typedInput("type");
-
-                        if (type != time1._prevType)
-                        {
-                            time1._prevType = type;
-                            if ((type != "sun") && (type != "moon"))
-                            {
-                                time1.typedInput("value", "");
-                            }
-                        }
-                    });
-
-                    time2.on("change", function()
-                    {
-                        let type = time2.typedInput("type");
-
-                        if (type != time2._prevType)
-                        {
-                            time2._prevType = type;
-                            if ((type != "sun") && (type != "moon"))
-                            {
-                                time2.typedInput("value", "");
-                            }
-                        }
-                    });
-
-                    function showExtensionRow1()
-                    {
-                        time1Row2.show();
-                        extend1.html("<i class='fa fa-angle-double-up' aria-hidden='true'></i>");
-                    }
-
-                    function hideExtensionRow1()
-                    {
-                        time1Row2.hide();
-                        extend1.html("<i class='fa fa-angle-double-down' aria-hidden='true'></i>");
-
-                        offset1.spinner("value", 0);
-                        random1.prop("checked", false);
-                    }
-
-                    function showExtensionRow2()
-                    {
-                        time2Row2.show();
-                        extend2.html("<i class='fa fa-angle-double-up' aria-hidden='true'></i>");
-                    }
-
-                    function hideExtensionRow2()
-                    {
-                        time2Row2.hide();
-                        extend2.html("<i class='fa fa-angle-double-down' aria-hidden='true'></i>");
-
-                        offset2.spinner("value", 0);
-                        random2.prop("checked", false);
-                    }
-
-                    extend1.click(function()
-                    {
-                        if (time1Row2.is(":hidden"))
-                        {
-                            showExtensionRow1();
-                        }
-                        else
-                        {
-                            hideExtensionRow1();
-                        }
-                    });
-
-                    extend2.click(function()
-                    {
-                        if (time2Row2.is(":hidden"))
-                        {
-                            showExtensionRow2();
-                        }
-                        else
-                        {
-                            hideExtensionRow2();
-                        }
-                    });
-
-                    hideExtensionRow1();
-                    hideExtensionRow2();
-
-                    if (!("operator" in data))
-                    {
-                        data = {operator: "before", operands: {type: "time", value: "", offset: 0, random: false}};
-                    }
-
-                    operator.val(data.operator);
-
-                    if ((data.operator == "before") || (data.operator == "after"))
-                    {
-                        time1._prevType = data.operands.type;
-                        time1.typedInput("type", data.operands.type);
-                        time1.typedInput("value", data.operands.value);
-                        if (data.operands.offset &&  // backwards compatibility to v1.0.2
-                            (data.operands.offset != 0))
-                        {
-                            offset1.spinner("value", data.operands.offset);
-                            random1.prop("checked", data.operands.random);
-                            showExtensionRow1();
-                        }
-                    }
-                    else if ((data.operator == "between") || (data.operator == "outside"))
-                    {
-                        time1._prevType = data.operands[0].type;
-                        time1.typedInput("type", data.operands[0].type);
-                        time1.typedInput("value", data.operands[0].value);
-                        time2._prevType = data.operands[1].type;
-                        time2.typedInput("type", data.operands[1].type);
-                        time2.typedInput("value", data.operands[1].value);
-                        if (data.operands[0].offset &&  // backwards compatibility to v1.0.2
-                            (data.operands[0].offset != 0))
-                        {
-                            offset1.spinner("value", data.operands[0].offset);
-                            random1.prop("checked", data.operands[0].random);
-                            showExtensionRow1();
-                        }
-                        if (data.operands[1].offset &&  // backwards compatibility to v1.0.2
-                            (data.operands[1].offset != 0))
-                        {
-                            offset2.spinner("value", data.operands[1].offset);
-                            random2.prop("checked", data.operands[1].random);
-                            showExtensionRow2();
-                        }
-                    }
-                    else if (data.operator == "weekdays")
-                    {
-                        sunday.prop("checked", data.operands[0]);
-                        monday.prop("checked", data.operands[1]);
-                        tuesday.prop("checked", data.operands[2]);
-                        wednesday.prop("checked", data.operands[3]);
-                        thursday.prop("checked", data.operands[4]);
-                        friday.prop("checked", data.operands[5]);
-                        saturday.prop("checked", data.operands[6]);
-                    }
-                    else if (data.operator == "months")
-                    {
-                        january.prop("checked", data.operands[0]);
-                        february.prop("checked", data.operands[1]);
-                        march.prop("checked", data.operands[2]);
-                        april.prop("checked", data.operands[3]);
-                        may.prop("checked", data.operands[4]);
-                        june.prop("checked", data.operands[5]);
-                        july.prop("checked", data.operands[6]);
-                        august.prop("checked", data.operands[7]);
-                        september.prop("checked", data.operands[8]);
-                        october.prop("checked", data.operands[9]);
-                        november.prop("checked", data.operands[10]);
-                        december.prop("checked", data.operands[11]);
-                    }
-                    else if (data.operator == "context")
-                    {
-                        context.typedInput("value", data.context.value);
-                        context.typedInput("type", data.context.type);
-                    }
-
-                    operator.change();
-                    item[0].appendChild(fragment);
+            const offsetInput = {
+              min: -300,
+              max: 300,
+              step: 5,
+              change: function (event, ui) {
+                var value = parseInt($(this).spinner("value"), 10);
+                var min = $(this).spinner("option", "min");
+                var max = $(this).spinner("option", "max");
+                if (isNaN(value) || value < min) {
+                  $(this).spinner("value", min);
+                } else if (value > max) {
+                  $(this).spinner("value", max);
                 }
+              },
+            };
+
+            let fragment = document.createDocumentFragment();
+            let operatorBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto;",
+            }).appendTo(fragment);
+            let timeBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;",
+            }).appendTo(fragment);
+            let weekdaysBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;",
+            }).appendTo(fragment);
+            let monthsBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 2px;",
+            }).appendTo(fragment);
+            let contextBox = $("<div/>", {
+              style:
+                "display: inline-block; vertical-align: middle; width: auto; margin-left: 6px;",
+            }).appendTo(fragment);
+
+            let operator = $("<select/>", {
+              class: "node-input-operator",
+              style: "width: 120px;",
+            }).appendTo(operatorBox);
+            let operGrp = $("<optgroup></optgroup>")
+              .attr(
+                "label",
+                node._(
+                  "maya-red-scheduler/time-config:common.list.condition.operators"
+                )
+              )
+              .append(
+                $("<option></option>")
+                  .val("before")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.condition.operator.before"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("after")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.condition.operator.after"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("between")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.condition.operator.between"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("outside")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.condition.operator.outside"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("weekdays")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.condition.operator.weekdays"
+                    )
+                  )
+              )
+              .append(
+                $("<option></option>")
+                  .val("months")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.condition.operator.months"
+                    )
+                  )
+              )
+              .appendTo(operator);
+            let fromGrp = $("<optgroup></optgroup>")
+              .attr(
+                "label",
+                node._(
+                  "maya-red-scheduler/time-config:common.list.condition.sources"
+                )
+              )
+              .append(
+                $("<option></option>")
+                  .val("context")
+                  .text(
+                    node._(
+                      "maya-red-scheduler/time-config:common.list.condition.source.context"
+                    )
+                  )
+              )
+              .appendTo(operator);
+
+            let time1Box = $("<div/>", { style: "margin-left: 4px;" }).appendTo(
+              timeBox
+            );
+            let time2Box = $("<div/>", {
+              style: "margin-left: 4px; margin-top: 5px;",
+            }).appendTo(timeBox);
+            let time1Row1 = $("<div/>").appendTo(time1Box);
+            let time1Row2 = $("<div/>", { style: "margin-top: 5px;" }).appendTo(
+              time1Box
+            );
+            let time2Row1 = $("<div/>").appendTo(time2Box);
+            let time2Row2 = $("<div/>", { style: "margin-top: 5px;" }).appendTo(
+              time2Box
+            );
+            let monthsRow1 = $("<div/>").appendTo(monthsBox);
+            let monthsRow2 = $("<div/>", {
+              style: "margin-top: 5px;",
+            }).appendTo(monthsBox);
+            let monthsRow3 = $("<div/>", {
+              style: "margin-top: 5px;",
+            }).appendTo(monthsBox);
+
+            let time1 = $("<input/>", {
+              type: "text",
+              class: "node-input-time1",
+            })
+              .appendTo(time1Row1)
+              .typedInput({
+                types: [timeInput, sunTimeInput, moonTimeInput, customInput],
+              });
+            time1.typedInput("width", "280px");
+            time1._prevType = "time";
+            let extend1 = $("<a/>", { href: "#", style: "margin-left: 6px;" })
+              .html(
+                "<i class='fa fa-angle-double-down' aria-hidden='true'></i>"
+              )
+              .appendTo(time1Row1);
+
+            let time2 = $("<input/>", {
+              type: "text",
+              class: "node-input-time2",
+            })
+              .appendTo(time2Row1)
+              .typedInput({
+                types: [timeInput, sunTimeInput, moonTimeInput, customInput],
+              });
+            time2.typedInput("width", "280px");
+            time2._prevType = "time";
+            let extend2 = $("<a/>", { href: "#", style: "margin-left: 6px;" })
+              .html(
+                "<i class='fa fa-angle-double-down' aria-hidden='true'></i>"
+              )
+              .appendTo(time2Row1);
+
+            $("<label/>", { style: "width: auto; margin-right: 6px;" })
+              .text(
+                node._("maya-red-scheduler/time-config:common.label.offset")
+              )
+              .appendTo(time1Row2);
+            let offset1 = $("<input/>", {
+              class: "node-input-offset1",
+              style: "width: 50px;",
+            })
+              .appendTo(time1Row2)
+              .spinner(offsetInput);
+            let random1 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-random1",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(time1Row2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.label.random")
+              )
+              .appendTo(time1Row2);
+
+            $("<label/>", { style: "width: auto; margin-right: 6px;" })
+              .text(
+                node._("maya-red-scheduler/time-config:common.label.offset")
+              )
+              .appendTo(time2Row2);
+            let offset2 = $("<input/>", {
+              class: "node-input-offset2",
+              style: "width: 50px;",
+            })
+              .appendTo(time2Row2)
+              .spinner(offsetInput);
+            let random2 = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-random2",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(time2Row2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.label.random")
+              )
+              .appendTo(time2Row2);
+
+            let monday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-monday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weekdaysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.monday"
+                )
+              )
+              .appendTo(weekdaysBox);
+            let tuesday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-tuesday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weekdaysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.tuesday"
+                )
+              )
+              .appendTo(weekdaysBox);
+            let wednesday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-wednesday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weekdaysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.wednesday"
+                )
+              )
+              .appendTo(weekdaysBox);
+            let thursday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-thursday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weekdaysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.thursday"
+                )
+              )
+              .appendTo(weekdaysBox);
+            let friday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-friday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weekdaysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.friday"
+                )
+              )
+              .appendTo(weekdaysBox);
+            let saturday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-saturday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weekdaysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.saturday"
+                )
+              )
+              .appendTo(weekdaysBox);
+            let sunday = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-sunday",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(weekdaysBox);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: auto;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.weekday.sunday"
+                )
+              )
+              .appendTo(weekdaysBox);
+
+            let january = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-january",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.january"
+                )
+              )
+              .appendTo(monthsRow1);
+            let february = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-february",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.february"
+                )
+              )
+              .appendTo(monthsRow1);
+            let march = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-march",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.march")
+              )
+              .appendTo(monthsRow1);
+            let april = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-april",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow1);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.april")
+              )
+              .appendTo(monthsRow1);
+            let may = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-may",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.may")
+              )
+              .appendTo(monthsRow2);
+            let june = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-june",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.june")
+              )
+              .appendTo(monthsRow2);
+            let july = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-july",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._("maya-red-scheduler/time-config:common.list.month.july")
+              )
+              .appendTo(monthsRow2);
+            let august = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-august",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow2);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.august"
+                )
+              )
+              .appendTo(monthsRow2);
+            let september = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-september",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.september"
+                )
+              )
+              .appendTo(monthsRow3);
+            let october = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-october",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.october"
+                )
+              )
+              .appendTo(monthsRow3);
+            let november = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-november",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.november"
+                )
+              )
+              .appendTo(monthsRow3);
+            let december = $("<input/>", {
+              type: "checkbox",
+              class: "node-input-december",
+              style:
+                "width: auto; margin-top: 0px; margin-bottom: 1px; margin-left: 6px;",
+            }).appendTo(monthsRow3);
+            $("<label/>", {
+              style: "margin-left: 4px; margin-bottom: 0px; width: 40px;",
+            })
+              .text(
+                node._(
+                  "maya-red-scheduler/time-config:common.list.month.december"
+                )
+              )
+              .appendTo(monthsRow3);
+
+            let context = $("<input/>", {
+              type: "text",
+              class: "node-input-context",
+            })
+              .appendTo(contextBox)
+              .typedInput({ types: ["global", "flow"] });
+            context.typedInput("width", "280px");
+
+            operator.change(function () {
+              timeBox.hide();
+              time2Box.hide();
+              weekdaysBox.hide();
+              monthsBox.hide();
+              contextBox.hide();
+
+              var value = $(this).val();
+              switch (value) {
+                case "before":
+                case "after": {
+                  timeBox.show();
+                  break;
+                }
+                case "between":
+                case "outside": {
+                  timeBox.show();
+                  time2Box.show();
+                  break;
+                }
+                case "weekdays": {
+                  weekdaysBox.show();
+                  break;
+                }
+                case "months": {
+                  monthsBox.show();
+                  break;
+                }
+                case "context": {
+                  contextBox.show();
+                  break;
+                }
+              }
             });
 
-            $("#node-input-annotateOnly").change(function()
-            {
-                if ($(this).prop("checked"))
-                {
-                    $("#node-input-allMustMatch").attr("disabled", true);
-                    $("label[for='node-input-allMustMatch']").addClass("disabled");
+            time1.on("change", function () {
+              let type = time1.typedInput("type");
+
+              if (type != time1._prevType) {
+                time1._prevType = type;
+                if (type != "sun" && type != "moon") {
+                  time1.typedInput("value", "");
                 }
-                else
-                {
-                    $("#node-input-allMustMatch").attr("disabled", false);
-                    $("label[for='node-input-allMustMatch']").removeClass("disabled");
-                }
+              }
             });
 
-            node.conditions.forEach(data =>
-            {
-                conditionList.editableList("addItem", data);
+            time2.on("change", function () {
+              let type = time2.typedInput("type");
+
+              if (type != time2._prevType) {
+                time2._prevType = type;
+                if (type != "sun" && type != "moon") {
+                  time2.typedInput("value", "");
+                }
+              }
             });
-        },
-        oneditsave: function()
-        {
-            let node = this;
 
-            let conditionList = $("#node-input-conditionList").editableList("items");
-            node.conditions = [];
-
-            conditionList.each(function(index)
-            {
-                let data = {};
-
-                let operator = $(this).find(".node-input-operator");
-                let time1 = $(this).find(".node-input-time1");
-                let time2 = $(this).find(".node-input-time2");
-                let offset1 = $(this).find(".node-input-offset1");
-                let offset2 = $(this).find(".node-input-offset2");
-                let random1 = $(this).find(".node-input-random1");
-                let random2 = $(this).find(".node-input-random2");
-                let monday = $(this).find(".node-input-monday");
-                let tuesday = $(this).find(".node-input-tuesday");
-                let wednesday = $(this).find(".node-input-wednesday");
-                let thursday = $(this).find(".node-input-thursday");
-                let friday = $(this).find(".node-input-friday");
-                let saturday = $(this).find(".node-input-saturday");
-                let sunday = $(this).find(".node-input-sunday");
-                let january = $(this).find(".node-input-january");
-                let february = $(this).find(".node-input-february");
-                let march = $(this).find(".node-input-march");
-                let april = $(this).find(".node-input-april");
-                let may = $(this).find(".node-input-may");
-                let june = $(this).find(".node-input-june");
-                let july = $(this).find(".node-input-july");
-                let august = $(this).find(".node-input-august");
-                let september = $(this).find(".node-input-september");
-                let october = $(this).find(".node-input-october");
-                let november = $(this).find(".node-input-november");
-                let december = $(this).find(".node-input-december");
-                let context = $(this).find(".node-input-context");
-
-                data.operator = operator.val();
-
-                if ((data.operator == "before") || (data.operator == "after"))
-                {
-                    data.operands = {};
-                    data.operands.type = time1.typedInput("type");
-                    data.operands.value = time1.typedInput("value");
-                    data.operands.offset = offset1.spinner("value");
-                    data.operands.random = random1.prop("checked");
-                }
-                else if ((data.operator == "between") || (data.operator == "outside"))
-                {
-                    data.operands = [{}, {}];
-                    data.operands[0].type = time1.typedInput("type");
-                    data.operands[0].value = time1.typedInput("value");
-                    data.operands[0].offset = offset1.spinner("value");
-                    data.operands[0].random = random1.prop("checked");
-                    data.operands[1].type = time2.typedInput("type");
-                    data.operands[1].value = time2.typedInput("value");
-                    data.operands[1].offset = offset2.spinner("value");
-                    data.operands[1].random = random2.prop("checked");
-                }
-                else if (data.operator == "weekdays")
-                {
-                    data.operands = [false, false, false, false, false, false, false];
-                    data.operands[0] = sunday.prop("checked");
-                    data.operands[1] = monday.prop("checked");
-                    data.operands[2] = tuesday.prop("checked");
-                    data.operands[3] = wednesday.prop("checked");
-                    data.operands[4] = thursday.prop("checked");
-                    data.operands[5] = friday.prop("checked");
-                    data.operands[6] = saturday.prop("checked");
-                }
-                else if (data.operator == "months")
-                {
-                    data.operands = [false, false, false, false, false, false, false, false, false, false, false, false];
-                    data.operands[0] = january.prop("checked");
-                    data.operands[1] = february.prop("checked");
-                    data.operands[2] = march.prop("checked");
-                    data.operands[3] = april.prop("checked");
-                    data.operands[4] = may.prop("checked");
-                    data.operands[5] = june.prop("checked");
-                    data.operands[6] = july.prop("checked");
-                    data.operands[7] = august.prop("checked");
-                    data.operands[8] = september.prop("checked");
-                    data.operands[9] = october.prop("checked");
-                    data.operands[10] = november.prop("checked");
-                    data.operands[11] = december.prop("checked");
-                }
-                else if (data.operator == "context")
-                {
-                    data.context = {};
-                    data.context.value = context.typedInput("value");
-                    data.context.type = context.typedInput("type");
-                }
-
-                node.conditions.push(data);
-            });
-        },
-        oneditresize: function(size)
-        {
-            let height = size.height;
-            let conditionListRow = $("#dialog-form>div.node-input-conditionList-row");
-            let otherRows = $("#dialog-form>div:not(.node-input-conditionList-row)");
-
-            for (let i=0; i<otherRows.length; ++i)
-            {
-                height -= $(otherRows[i]).outerHeight(true);
+            function showExtensionRow1() {
+              time1Row2.show();
+              extend1.html(
+                "<i class='fa fa-angle-double-up' aria-hidden='true'></i>"
+              );
             }
 
-            height -= (parseInt(conditionListRow.css("marginTop")) + parseInt(conditionListRow.css("marginBottom")));
-            height -= $("#dialog-form>div.node-input-conditionList-row>label").outerHeight(true);
+            function hideExtensionRow1() {
+              time1Row2.hide();
+              extend1.html(
+                "<i class='fa fa-angle-double-down' aria-hidden='true'></i>"
+              );
 
-            $("#node-input-conditionList").editableList("height", height);
+              offset1.spinner("value", 0);
+              random1.prop("checked", false);
+            }
+
+            function showExtensionRow2() {
+              time2Row2.show();
+              extend2.html(
+                "<i class='fa fa-angle-double-up' aria-hidden='true'></i>"
+              );
+            }
+
+            function hideExtensionRow2() {
+              time2Row2.hide();
+              extend2.html(
+                "<i class='fa fa-angle-double-down' aria-hidden='true'></i>"
+              );
+
+              offset2.spinner("value", 0);
+              random2.prop("checked", false);
+            }
+
+            extend1.click(function () {
+              if (time1Row2.is(":hidden")) {
+                showExtensionRow1();
+              } else {
+                hideExtensionRow1();
+              }
+            });
+
+            extend2.click(function () {
+              if (time2Row2.is(":hidden")) {
+                showExtensionRow2();
+              } else {
+                hideExtensionRow2();
+              }
+            });
+
+            hideExtensionRow1();
+            hideExtensionRow2();
+
+            if (!("operator" in data)) {
+              data = {
+                operator: "before",
+                operands: { type: "time", value: "", offset: 0, random: false },
+              };
+            }
+
+            operator.val(data.operator);
+
+            if (data.operator == "before" || data.operator == "after") {
+              time1._prevType = data.operands.type;
+              time1.typedInput("type", data.operands.type);
+              time1.typedInput("value", data.operands.value);
+              if (
+                data.operands.offset && // backwards compatibility to v1.0.2
+                data.operands.offset != 0
+              ) {
+                offset1.spinner("value", data.operands.offset);
+                random1.prop("checked", data.operands.random);
+                showExtensionRow1();
+              }
+            } else if (
+              data.operator == "between" ||
+              data.operator == "outside"
+            ) {
+              time1._prevType = data.operands[0].type;
+              time1.typedInput("type", data.operands[0].type);
+              time1.typedInput("value", data.operands[0].value);
+              time2._prevType = data.operands[1].type;
+              time2.typedInput("type", data.operands[1].type);
+              time2.typedInput("value", data.operands[1].value);
+              if (
+                data.operands[0].offset && // backwards compatibility to v1.0.2
+                data.operands[0].offset != 0
+              ) {
+                offset1.spinner("value", data.operands[0].offset);
+                random1.prop("checked", data.operands[0].random);
+                showExtensionRow1();
+              }
+              if (
+                data.operands[1].offset && // backwards compatibility to v1.0.2
+                data.operands[1].offset != 0
+              ) {
+                offset2.spinner("value", data.operands[1].offset);
+                random2.prop("checked", data.operands[1].random);
+                showExtensionRow2();
+              }
+            } else if (data.operator == "weekdays") {
+              sunday.prop("checked", data.operands[0]);
+              monday.prop("checked", data.operands[1]);
+              tuesday.prop("checked", data.operands[2]);
+              wednesday.prop("checked", data.operands[3]);
+              thursday.prop("checked", data.operands[4]);
+              friday.prop("checked", data.operands[5]);
+              saturday.prop("checked", data.operands[6]);
+            } else if (data.operator == "months") {
+              january.prop("checked", data.operands[0]);
+              february.prop("checked", data.operands[1]);
+              march.prop("checked", data.operands[2]);
+              april.prop("checked", data.operands[3]);
+              may.prop("checked", data.operands[4]);
+              june.prop("checked", data.operands[5]);
+              july.prop("checked", data.operands[6]);
+              august.prop("checked", data.operands[7]);
+              september.prop("checked", data.operands[8]);
+              october.prop("checked", data.operands[9]);
+              november.prop("checked", data.operands[10]);
+              december.prop("checked", data.operands[11]);
+            } else if (data.operator == "context") {
+              context.typedInput("value", data.context.value);
+              context.typedInput("type", data.context.type);
+            }
+
+            operator.change();
+            item[0].appendChild(fragment);
+          },
+        });
+
+      $("#node-input-annotateOnly").change(function () {
+        if ($(this).prop("checked")) {
+          $("#node-input-allMustMatch").attr("disabled", true);
+          $("label[for='node-input-allMustMatch']").addClass("disabled");
+        } else {
+          $("#node-input-allMustMatch").attr("disabled", false);
+          $("label[for='node-input-allMustMatch']").removeClass("disabled");
         }
-    });
+      });
+
+      node.conditions.forEach((data) => {
+        conditionList.editableList("addItem", data);
+      });
+    },
+    oneditsave: function () {
+      let node = this;
+
+      let conditionList = $("#node-input-conditionList").editableList("items");
+      node.conditions = [];
+
+      conditionList.each(function (index) {
+        let data = {};
+
+        let operator = $(this).find(".node-input-operator");
+        let time1 = $(this).find(".node-input-time1");
+        let time2 = $(this).find(".node-input-time2");
+        let offset1 = $(this).find(".node-input-offset1");
+        let offset2 = $(this).find(".node-input-offset2");
+        let random1 = $(this).find(".node-input-random1");
+        let random2 = $(this).find(".node-input-random2");
+        let monday = $(this).find(".node-input-monday");
+        let tuesday = $(this).find(".node-input-tuesday");
+        let wednesday = $(this).find(".node-input-wednesday");
+        let thursday = $(this).find(".node-input-thursday");
+        let friday = $(this).find(".node-input-friday");
+        let saturday = $(this).find(".node-input-saturday");
+        let sunday = $(this).find(".node-input-sunday");
+        let january = $(this).find(".node-input-january");
+        let february = $(this).find(".node-input-february");
+        let march = $(this).find(".node-input-march");
+        let april = $(this).find(".node-input-april");
+        let may = $(this).find(".node-input-may");
+        let june = $(this).find(".node-input-june");
+        let july = $(this).find(".node-input-july");
+        let august = $(this).find(".node-input-august");
+        let september = $(this).find(".node-input-september");
+        let october = $(this).find(".node-input-october");
+        let november = $(this).find(".node-input-november");
+        let december = $(this).find(".node-input-december");
+        let context = $(this).find(".node-input-context");
+
+        data.operator = operator.val();
+
+        if (data.operator == "before" || data.operator == "after") {
+          data.operands = {};
+          data.operands.type = time1.typedInput("type");
+          data.operands.value = time1.typedInput("value");
+          data.operands.offset = offset1.spinner("value");
+          data.operands.random = random1.prop("checked");
+        } else if (data.operator == "between" || data.operator == "outside") {
+          data.operands = [{}, {}];
+          data.operands[0].type = time1.typedInput("type");
+          data.operands[0].value = time1.typedInput("value");
+          data.operands[0].offset = offset1.spinner("value");
+          data.operands[0].random = random1.prop("checked");
+          data.operands[1].type = time2.typedInput("type");
+          data.operands[1].value = time2.typedInput("value");
+          data.operands[1].offset = offset2.spinner("value");
+          data.operands[1].random = random2.prop("checked");
+        } else if (data.operator == "weekdays") {
+          data.operands = [false, false, false, false, false, false, false];
+          data.operands[0] = sunday.prop("checked");
+          data.operands[1] = monday.prop("checked");
+          data.operands[2] = tuesday.prop("checked");
+          data.operands[3] = wednesday.prop("checked");
+          data.operands[4] = thursday.prop("checked");
+          data.operands[5] = friday.prop("checked");
+          data.operands[6] = saturday.prop("checked");
+        } else if (data.operator == "months") {
+          data.operands = [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+          ];
+          data.operands[0] = january.prop("checked");
+          data.operands[1] = february.prop("checked");
+          data.operands[2] = march.prop("checked");
+          data.operands[3] = april.prop("checked");
+          data.operands[4] = may.prop("checked");
+          data.operands[5] = june.prop("checked");
+          data.operands[6] = july.prop("checked");
+          data.operands[7] = august.prop("checked");
+          data.operands[8] = september.prop("checked");
+          data.operands[9] = october.prop("checked");
+          data.operands[10] = november.prop("checked");
+          data.operands[11] = december.prop("checked");
+        } else if (data.operator == "context") {
+          data.context = {};
+          data.context.value = context.typedInput("value");
+          data.context.type = context.typedInput("type");
+        }
+
+        node.conditions.push(data);
+      });
+    },
+    oneditresize: function (size) {
+      let height = size.height;
+      let conditionListRow = $("#dialog-form>div.node-input-conditionList-row");
+      let otherRows = $("#dialog-form>div:not(.node-input-conditionList-row)");
+
+      for (let i = 0; i < otherRows.length; ++i) {
+        height -= $(otherRows[i]).outerHeight(true);
+      }
+
+      height -=
+        parseInt(conditionListRow.css("marginTop")) +
+        parseInt(conditionListRow.css("marginBottom"));
+      height -= $(
+        "#dialog-form>div.node-input-conditionList-row>label"
+      ).outerHeight(true);
+
+      $("#node-input-conditionList").editableList("height", height);
+    },
+  });
 </script>

@@ -23,166 +23,166 @@ SOFTWARE.
 -->
 
 <script type="text/x-red" data-help-name="chronos-scheduler">
-    <p>
-        Plant das Versenden von Nachrichten oder Setzen von globalen /
-        Flow-spezifischen Variablen zu bestimmten Uhrzeiten.
-    </p>
-    <h3>Details</h3>
-    <p>
-        Dieser Knoten kann Nachrichten schicken oder globale / Flow-spezifische
-        Variablen setzen sobald eine geplant Uhrzeit erreicht wurde. Der Zeitpunkt
-        kann entweder direkt eingegeben oder anhand von Sonnen- oder Mondständen
-        berechnet werden. Mehrere Zeitereignisse können geplant werden und jedes
-        Ereignis kann unterschiedliche Auslöser haben und unterschiedliche Ausgaben
-        erzeugen.
-    </p>
-    <p>
-        Für weitere Informationen bitte die ausführliche Dokumentation im
-        <a href="https://github.com/jensrossbach/node-red-contrib-chronos/wiki/Scheduler-Node">Repository-Wiki</a>
-        öffnen (nur in Englisch verfügbar).
-    </p>
-    <h3>Konfiguration</h3>
-    <dl>
-        <dt>Name</dt>
-        <dd>Der Name des Knotens (optional).</dd>
-        <dt>Konfiguration</dt>
-        <dd>
-            Ein Verweis auf den zu verwendenden Konfigurationsknoten.
-        </dd>
-        <dt>Zeitplan</dt>
-        <dd>
-            Liste der geplanten Zeitereignisse. Neue Einträge können über den
-            Button unterhalb der Liste hinzugefügt werden. Vorhandene Einträge
-            können neu angeordnet oder gelöscht werden.
-            Jeder Eintrag in der Liste kann wie folgt konfiguriert werden:
-            <ul>
-                <li>
-                    Der Zielzeitpunkt, zu dem eine Ausgabe erzeugt werden soll.
-                    Abhängig von der Auswahl auf der linken Seite gibt es
-                    folgende Möglichkeiten:
-                    <ul>
-                        <li>
-                            <i>Uhrzeit</i>: Eine beliebige Uhrzeit kann direkt
-                            in der Form <code>hh:mm[:ss] [am|pm]</code>
-                            eingegeben werden.
-                        </li>
-                        <li>
-                            <i>Sonnenstand</i>: Der Sonnenstand kann aus einer
-                            Liste vorgegebener Werte ausgewählt werden.
-                        </li>
-                        <li>
-                            <i>Mondstand</i>: Der Mondstand kann aus einer Liste
-                            vorgegebener Werte ausgewählt werden.
-                        </li>
-                        <li>
-                            <i>Benutzerdefiniert</i>: Einer der Namen für
-                            benutzerdefinierte Sonnenstände kann eingegeben
-                            werden.
-                        </li>
-                        <li>
-                            <i>global</i>: Der Zielzeitpunkt wird aus der
-                            angegebenen globalen Kontextvariablen geladen,
-                            siehe Kapitel <i>Eingabe</i> für weitere Informationen.
-                        </li>
-                        <li>
-                            <i>flow</i>: Der Zielzeitpunkt wird aus der
-                            angegebenen Flow-Kontextvariablen geladen,
-                            siehe Kapitel <i>Eingabe</i> für weitere Informationen.
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    Ein zeitlicher Versatz in Minuten zwischen -5h und +5h kann
-                    angegeben werden. Der Versatz wird zur Zielzeit hinzuaddiert
-                    oder davon abgezogen.
-                </li>
-                <li>
-                    Ist die Checkbox auf der rechten Seite aktiviert, wird der
-                    Versatz im Bereich zwischen 0 und dem angegeben Wert
-                    zufällig ausgewählt.
-                </li>
-                <li>
-                    Die Ausgabe kann entweder eine vollständige Nachricht sein,
-                    spezifiziert als JSON-Ausdruck, eine einzelne Eigenschaft
-                    der Nachricht unterschiedlichen Typs oder eine globale oder
-                    Flow-spezifische Variable.
-                </li>
-            </ul>
-        </dd>
-        <dt>Separate Ausgabe-Ports für Zeitereignisse</dt>
-        <dd>
-            Wenn aktiviert, wird für jedes Zeitereignis, das eine Nachricht als
-            Ausgabe erzeugt, ein eigener Ausgabe-Port erstellt und die Nachricht
-            des Zeitereignisses wird an den zugehörigen Ausgabe-Port geschickt.
-            Für dynamisch programmierte Zeitereignisse wird immer ein Ausgabe-Port
-            angelegt, da zur Konfigurationszeit nicht feststeht, ob das Zeitereignis
-            eine Nachricht als Ausgabe erzeugt oder nicht.
-        </dd>
-        <dt>Mit inaktivem Zeitplan starten</dt>
-        <dd>
-            Wenn aktiviert, wird der Zeitplan beim Starten des Knotens initial
-            deaktiviert.
-        </dd>
-    </dl>
-    <h3>Eingabe</h3>
-    <dt>Zeitplan aktivieren/deaktivieren</dt>
-    <dd>
-        Eine Eingangsnachricht kann dazu verwendet werden, um den Zeitplan
-        oder einzelne Zeitereignisse zu aktivieren oder zu deaktivieren.
-        Das Aktivieren des Zeitplans führt auch dazu, dass programmierte
-        Zeitereignisse aus Kontextvariablen neu eingelesen werden.
-    </dd>
-    <dl class="message-properties">
-        <dt>payload<span class="property-type">boolean | array</span></dt>
-        <dd>Schalter zum Aktivieren oder Deaktivieren von Zeitereignissen</dd>
-    </dl>
-    <dd>
-        Wenn <code>msg.payload</code> ein boolescher Wert ist, wird der komplette
-        Zeitplan aktiviert, wenn der Wert wahr ist, ansonsten deaktiviert. Ist
-        <code>msg.payload</code> dagegen ein Array, muss jedes Element ein
-        boolescher Wert sein und ist dem Zeitereignis mit dem selben Index
-        zugeordnet. Wenn der Wert wahr ist, wird das zugehörige Zeitereignis
-        aktiviert, ansonsten deaktiviert.
-    </dd>
-    <dt>Zeitplan dynamisch programmieren</dt>
-    <dd>
-        Die Konfiguration des Zielzeitpunkts kann dynamisch aus einer
-        Kontextvariablen geladen werden. Die Variablen müssen Objekte sein und
-        die folgenden Eigenschaften enthalten:
-    </dd>
-    <dl class="message-properties">
-        <dt>type<span class="property-type">string</span></dt>
-        <dd>Auslöseart; entweder "time", "sun", "moon" oder "custom"</dd>
-        <dt>value<span class="property-type">string | number</span></dt>
-        <dd>Auslösezeitpunkt; der Inhalt ist abhängig von der Auslöseart</dd>
-        <dt>offset<span class="property-type">number</span></dt>
-        <dd>Zeitlicher Versatz zum Auslösezeitpunkt</dd>
-        <dt>random<span class="property-type">boolean</span></dt>
-        <dd>Zufälliger Zeitversatz</dd>
-    </dl>
-    <dd>
-        Außerdem ist es möglich, die Ausgaben der Zeitereignisse zu überschreiben.
-        In diesem Fall muss ein erweitertes Format für die Kontextvariablen
-        verwendet werden, bei dem die Daten für den Zielzeitpunkt (siehe oben)
-        in eine Objekteigenschaft mit dem Namen <code>trigger</code> eingebettet
-        werden und folgende weitere Eigenschaften vorhanden sind:
-    </dd>
-    <dl class="message-properties">
-        <dt>output.type<span class="property-type">string</span></dt>
-        <dd>Ausgabeart; entweder "global", "flow", "msg" oder "fullMsg"</dd>
-        <dt class="optional">output.value<span class="property-type">object</span></dt>
-        <dd>Nur wenn Ausgabeart "fullMsg" ist; Inhalt der Ausgabenachricht</dd>
-        <dt class="optional">output.property.name<span class="property-type">string</span></dt>
-        <dd>Nur wenn Ausgabeart nicht "fullMsg" ist; Name der Ausgabe-Eigenschaft/-Variablen</dd>
-        <dt class="optional">output.property.type<span class="property-type">string</span></dt>
-        <dd>Kann optional auf "date" gesetzt und <code>output.property.value</code> ausgelassen werden, um das gleiche Verhalten zu bekommen, als wäre <i>timestamp</i> als Typ in der Benutzeroberfläche ausgewählt worden</dd>
-        <dt class="optional">output.property.value<span class="property-type">any</span></dt>
-        <dd>Nur wenn Ausgabeart nicht "fullMsg" ist; Wert der Ausgabe-Eigenschaft/-Variablen</dd>
-    </dl>
-    <h3>Ausgaben</h3>
-    <p>
-        Geplante Nachrichten werden an den Ausgabe-Port der Nachricht gesendet.
-        Der Aufbau und Inhalt der Nachricht kann statisch über die Konfiguration
-        oder dynamisch über Kontextvariablen festgelegt werden.
-    </p>
+  <p>
+      Plant das Versenden von Nachrichten oder Setzen von globalen /
+      Flow-spezifischen Variablen zu bestimmten Uhrzeiten.
+  </p>
+  <h3>Details</h3>
+  <p>
+      Dieser Knoten kann Nachrichten schicken oder globale / Flow-spezifische
+      Variablen setzen sobald eine geplant Uhrzeit erreicht wurde. Der Zeitpunkt
+      kann entweder direkt eingegeben oder anhand von Sonnen- oder Mondständen
+      berechnet werden. Mehrere Zeitereignisse können geplant werden und jedes
+      Ereignis kann unterschiedliche Auslöser haben und unterschiedliche Ausgaben
+      erzeugen.
+  </p>
+  <p>
+      Für weitere Informationen bitte die ausführliche Dokumentation im
+      <a href="https://github.com/mayahq/maya-red-scheduler/wiki/Scheduler-Node">Repository-Wiki</a>
+      öffnen (nur in Englisch verfügbar).
+  </p>
+  <h3>Konfiguration</h3>
+  <dl>
+      <dt>Name</dt>
+      <dd>Der Name des Knotens (optional).</dd>
+      <dt>Konfiguration</dt>
+      <dd>
+          Ein Verweis auf den zu verwendenden Konfigurationsknoten.
+      </dd>
+      <dt>Zeitplan</dt>
+      <dd>
+          Liste der geplanten Zeitereignisse. Neue Einträge können über den
+          Button unterhalb der Liste hinzugefügt werden. Vorhandene Einträge
+          können neu angeordnet oder gelöscht werden.
+          Jeder Eintrag in der Liste kann wie folgt konfiguriert werden:
+          <ul>
+              <li>
+                  Der Zielzeitpunkt, zu dem eine Ausgabe erzeugt werden soll.
+                  Abhängig von der Auswahl auf der linken Seite gibt es
+                  folgende Möglichkeiten:
+                  <ul>
+                      <li>
+                          <i>Uhrzeit</i>: Eine beliebige Uhrzeit kann direkt
+                          in der Form <code>hh:mm[:ss] [am|pm]</code>
+                          eingegeben werden.
+                      </li>
+                      <li>
+                          <i>Sonnenstand</i>: Der Sonnenstand kann aus einer
+                          Liste vorgegebener Werte ausgewählt werden.
+                      </li>
+                      <li>
+                          <i>Mondstand</i>: Der Mondstand kann aus einer Liste
+                          vorgegebener Werte ausgewählt werden.
+                      </li>
+                      <li>
+                          <i>Benutzerdefiniert</i>: Einer der Namen für
+                          benutzerdefinierte Sonnenstände kann eingegeben
+                          werden.
+                      </li>
+                      <li>
+                          <i>global</i>: Der Zielzeitpunkt wird aus der
+                          angegebenen globalen Kontextvariablen geladen,
+                          siehe Kapitel <i>Eingabe</i> für weitere Informationen.
+                      </li>
+                      <li>
+                          <i>flow</i>: Der Zielzeitpunkt wird aus der
+                          angegebenen Flow-Kontextvariablen geladen,
+                          siehe Kapitel <i>Eingabe</i> für weitere Informationen.
+                      </li>
+                  </ul>
+              </li>
+              <li>
+                  Ein zeitlicher Versatz in Minuten zwischen -5h und +5h kann
+                  angegeben werden. Der Versatz wird zur Zielzeit hinzuaddiert
+                  oder davon abgezogen.
+              </li>
+              <li>
+                  Ist die Checkbox auf der rechten Seite aktiviert, wird der
+                  Versatz im Bereich zwischen 0 und dem angegeben Wert
+                  zufällig ausgewählt.
+              </li>
+              <li>
+                  Die Ausgabe kann entweder eine vollständige Nachricht sein,
+                  spezifiziert als JSON-Ausdruck, eine einzelne Eigenschaft
+                  der Nachricht unterschiedlichen Typs oder eine globale oder
+                  Flow-spezifische Variable.
+              </li>
+          </ul>
+      </dd>
+      <dt>Separate Ausgabe-Ports für Zeitereignisse</dt>
+      <dd>
+          Wenn aktiviert, wird für jedes Zeitereignis, das eine Nachricht als
+          Ausgabe erzeugt, ein eigener Ausgabe-Port erstellt und die Nachricht
+          des Zeitereignisses wird an den zugehörigen Ausgabe-Port geschickt.
+          Für dynamisch programmierte Zeitereignisse wird immer ein Ausgabe-Port
+          angelegt, da zur Konfigurationszeit nicht feststeht, ob das Zeitereignis
+          eine Nachricht als Ausgabe erzeugt oder nicht.
+      </dd>
+      <dt>Mit inaktivem Zeitplan starten</dt>
+      <dd>
+          Wenn aktiviert, wird der Zeitplan beim Starten des Knotens initial
+          deaktiviert.
+      </dd>
+  </dl>
+  <h3>Eingabe</h3>
+  <dt>Zeitplan aktivieren/deaktivieren</dt>
+  <dd>
+      Eine Eingangsnachricht kann dazu verwendet werden, um den Zeitplan
+      oder einzelne Zeitereignisse zu aktivieren oder zu deaktivieren.
+      Das Aktivieren des Zeitplans führt auch dazu, dass programmierte
+      Zeitereignisse aus Kontextvariablen neu eingelesen werden.
+  </dd>
+  <dl class="message-properties">
+      <dt>payload<span class="property-type">boolean | array</span></dt>
+      <dd>Schalter zum Aktivieren oder Deaktivieren von Zeitereignissen</dd>
+  </dl>
+  <dd>
+      Wenn <code>msg.payload</code> ein boolescher Wert ist, wird der komplette
+      Zeitplan aktiviert, wenn der Wert wahr ist, ansonsten deaktiviert. Ist
+      <code>msg.payload</code> dagegen ein Array, muss jedes Element ein
+      boolescher Wert sein und ist dem Zeitereignis mit dem selben Index
+      zugeordnet. Wenn der Wert wahr ist, wird das zugehörige Zeitereignis
+      aktiviert, ansonsten deaktiviert.
+  </dd>
+  <dt>Zeitplan dynamisch programmieren</dt>
+  <dd>
+      Die Konfiguration des Zielzeitpunkts kann dynamisch aus einer
+      Kontextvariablen geladen werden. Die Variablen müssen Objekte sein und
+      die folgenden Eigenschaften enthalten:
+  </dd>
+  <dl class="message-properties">
+      <dt>type<span class="property-type">string</span></dt>
+      <dd>Auslöseart; entweder "time", "sun", "moon" oder "custom"</dd>
+      <dt>value<span class="property-type">string | number</span></dt>
+      <dd>Auslösezeitpunkt; der Inhalt ist abhängig von der Auslöseart</dd>
+      <dt>offset<span class="property-type">number</span></dt>
+      <dd>Zeitlicher Versatz zum Auslösezeitpunkt</dd>
+      <dt>random<span class="property-type">boolean</span></dt>
+      <dd>Zufälliger Zeitversatz</dd>
+  </dl>
+  <dd>
+      Außerdem ist es möglich, die Ausgaben der Zeitereignisse zu überschreiben.
+      In diesem Fall muss ein erweitertes Format für die Kontextvariablen
+      verwendet werden, bei dem die Daten für den Zielzeitpunkt (siehe oben)
+      in eine Objekteigenschaft mit dem Namen <code>trigger</code> eingebettet
+      werden und folgende weitere Eigenschaften vorhanden sind:
+  </dd>
+  <dl class="message-properties">
+      <dt>output.type<span class="property-type">string</span></dt>
+      <dd>Ausgabeart; entweder "global", "flow", "msg" oder "fullMsg"</dd>
+      <dt class="optional">output.value<span class="property-type">object</span></dt>
+      <dd>Nur wenn Ausgabeart "fullMsg" ist; Inhalt der Ausgabenachricht</dd>
+      <dt class="optional">output.property.name<span class="property-type">string</span></dt>
+      <dd>Nur wenn Ausgabeart nicht "fullMsg" ist; Name der Ausgabe-Eigenschaft/-Variablen</dd>
+      <dt class="optional">output.property.type<span class="property-type">string</span></dt>
+      <dd>Kann optional auf "date" gesetzt und <code>output.property.value</code> ausgelassen werden, um das gleiche Verhalten zu bekommen, als wäre <i>timestamp</i> als Typ in der Benutzeroberfläche ausgewählt worden</dd>
+      <dt class="optional">output.property.value<span class="property-type">any</span></dt>
+      <dd>Nur wenn Ausgabeart nicht "fullMsg" ist; Wert der Ausgabe-Eigenschaft/-Variablen</dd>
+  </dl>
+  <h3>Ausgaben</h3>
+  <p>
+      Geplante Nachrichten werden an den Ausgabe-Port der Nachricht gesendet.
+      Der Aufbau und Inhalt der Nachricht kann statisch über die Konfiguration
+      oder dynamisch über Kontextvariablen festgelegt werden.
+  </p>
 </script>

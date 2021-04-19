@@ -54,11 +54,28 @@
                     "outside":    "outside",
                     "weekdays":   "week days",
                     "months":     "months",
-                    "otherwise":  "otherwise"
+                    "otherwise":  "otherwise",
+                    "daily":      "daily",
+                    "hourly":     "hourly",
+                    "weekly":     "weekly",
+                    "monthly":    "monthly",
+                    "none":       "none"
                 },
                 "source":
                 {
                     "context":  "context"
+                }
+            },
+            "repeater" : {
+                "label":  "Repeat",
+                "sources":    "Source",
+                "list":
+                {
+                    "none":       "none",
+                    "hourly":     "hourly",
+                    "daily":      "daily",
+                    "weekly":     "weekly",
+                    "monthly":    "monthly"
                 }
             },
             "weekday":
